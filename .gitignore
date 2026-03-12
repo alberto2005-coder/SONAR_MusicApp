@@ -19,8 +19,8 @@ dist/
 .env.production.local
 
 # Base de datos local
-*.sqlite
-*.db
+# *.sqlite
+# *.db
 
 # Logs
 npm-debug.log*
