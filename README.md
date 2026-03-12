@@ -106,8 +106,4 @@ SONAR/
 <i>SONAR: High-Performance Music Streaming Platform</i>
 </div>
 
-```
 
-¿Te gusta cómo queda ahora? Se ve mucho más serio y profesional. ¿Hay algo más que quieras pulir antes de darlo por terminado?
-
-```
