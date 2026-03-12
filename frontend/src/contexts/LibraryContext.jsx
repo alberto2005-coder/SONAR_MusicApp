@@ -14,7 +14,6 @@ export const LibraryProvider = ({ children }) => {
     const downloadTrack = async (track) => {
         try {
             const query = `${track.artist.name} ${track.title}`;
-            // Abrimos en una pestaña nueva para iniciar la descarga desde el backend
             window.open(`http://localhost:5000/api/music/download?query=${encodeURIComponent(query)}`, '_blank');
         } catch (err) {
             console.error("Error al intentar descargar:", err);
@@ -42,19 +41,42 @@ export const LibraryProvider = ({ children }) => {
         fetchLibrary();
     }, [token]);
 
+    // CORRECCIÓN: Adaptado a las rutas reales de tu server.js
     const toggleFavorite = async (track) => {
+        if (!token || !track) return;
+
+        const trackIdStr = track.id.toString();
+        const alreadyFavorite = isFavorite(track.id);
+
         try {
-            await axios.post('http://localhost:5000/api/favorites/toggle',
-                { trackId: track.id, trackData: track },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            fetchLibrary();
+            if (alreadyFavorite) {
+                // Si ya es favorita, usamos la ruta DELETE de tu server.js
+                await axios.delete(`http://localhost:5000/api/favorites/${trackIdStr}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            } else {
+                // Si no es favorita, usamos la ruta POST de tu server.js
+                // Usamos los nombres de campos que espera tu DB: track_id y track_data
+                await axios.post('http://localhost:5000/api/favorites',
+                    {
+                        track_id: trackIdStr,
+                        track_data: track
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            }
+            // Refrescamos la biblioteca para que el corazón cambie al instante
+            await fetchLibrary();
         } catch (err) {
             console.error("Error en favoritos:", err);
         }
     };
 
-    const isFavorite = (trackId) => favorites.some(f => f.track_id === trackId.toString());
+    // Comparamos siempre como String para que coincida con la base de datos
+    const isFavorite = (trackId) => {
+        if (!trackId) return false;
+        return favorites.some(f => f.track_id === trackId.toString());
+    };
 
     return (
         <LibraryContext.Provider value={{

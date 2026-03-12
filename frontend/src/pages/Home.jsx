@@ -27,6 +27,13 @@ const Home = () => {
         fetchTrending();
     }, []);
 
+    // Función interna para manejar favoritos con log de depuración
+    const handleFavoriteAction = (e, track) => {
+        e.stopPropagation();
+        console.log("Acción de favorito en canción:", track.title);
+        toggleFavorite(track);
+    };
+
     return (
         <div className="text-white w-full h-full pb-10">
             {trackToAdd && <AddToPlaylistModal track={trackToAdd} onClose={() => setTrackToAdd(null)} />}
@@ -56,31 +63,31 @@ const Home = () => {
                                     <img src={track.album.cover_xl} alt={track.title} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" />
 
                                     {/* Botón Play Superpuesto */}
-                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                         <div className="bg-[#D4FF00] text-black p-3 rounded-full shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
                                             <Play size={24} fill="currentColor" />
                                         </div>
                                     </div>
 
-                                    {/* BOTONES DE ACCIÓN (ESQUINA SUPERIOR DERECHA) */}
-                                    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                    {/* BOTONES DE ACCIÓN (SUBIMOS Z-INDEX A 40) */}
+                                    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-40">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setTrackToAdd(track); }}
-                                            className="p-2 rounded-full backdrop-blur-md bg-black/60 text-white hover:text-[#D4FF00] transition"
+                                            className="p-2 rounded-full backdrop-blur-md bg-black/60 text-white hover:text-[#D4FF00] transition active:scale-90"
                                             title="Añadir a playlist"
                                         >
                                             <PlusCircle size={16} />
                                         </button>
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); toggleFavorite(track); }}
-                                            className={`p-2 rounded-full backdrop-blur-md bg-black/60 transition ${isFavorite(track.id) ? 'text-[#D4FF00]' : 'text-white hover:text-[#D4FF00]'}`}
+                                            onClick={(e) => handleFavoriteAction(e, track)}
+                                            className={`p-2 rounded-full backdrop-blur-md bg-black/60 transition active:scale-90 ${isFavorite(track.id) ? 'text-[#D4FF00]' : 'text-white hover:text-[#D4FF00]'}`}
                                             title="Favoritos"
                                         >
                                             <Heart size={16} fill={isFavorite(track.id) ? "currentColor" : "none"} />
                                         </button>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); downloadTrack(track); }}
-                                            className="p-2 rounded-full backdrop-blur-md bg-black/60 text-white hover:text-[#D4FF00] transition"
+                                            className="p-2 rounded-full backdrop-blur-md bg-black/60 text-white hover:text-[#D4FF00] transition active:scale-90"
                                             title="Descargar"
                                         >
                                             <Download size={16} />
@@ -88,7 +95,7 @@ const Home = () => {
                                     </div>
                                 </div>
 
-                                <h3 className={`font-bold text-sm truncate mb-1 ${currentTrack?.id === track.id ? 'text-[#D4FF00]' : 'text-white'}`}>
+                                <h3 className={`font-bold text-sm truncate mb-1 ${currentTrack?.id?.toString() === track?.id?.toString() ? 'text-[#D4FF00]' : 'text-white'}`}>
                                     {track.title}
                                 </h3>
                                 <p className="text-[#888888] text-xs truncate">{track.artist.name}</p>
@@ -104,27 +111,27 @@ const Home = () => {
                 {trending.slice(5, 15).map((track, index) => (
                     <div
                         key={`top-${track.id}`}
-                        className={`flex items-center justify-between p-2 hover:bg-[#111111] rounded group cursor-pointer transition-colors ${currentTrack?.id === track.id ? 'bg-[#111111]' : ''}`}
+                        className={`flex items-center justify-between p-2 hover:bg-[#111111] rounded group cursor-pointer transition-colors ${currentTrack?.id?.toString() === track?.id?.toString() ? 'bg-[#111111]' : ''}`}
                         onClick={() => playTrack(track, trending)}
                     >
                         <div className="flex items-center gap-4 flex-1">
                             <span className="text-[#555555] text-sm w-4 text-center font-mono">{index + 6}</span>
                             <img src={track.album.cover_small} alt="cover" className="w-10 h-10 object-cover rounded" />
                             <div>
-                                <h4 className={`font-bold text-sm ${currentTrack?.id === track.id ? 'text-[#D4FF00]' : 'text-white'}`}>
+                                <h4 className={`font-bold text-sm ${currentTrack?.id?.toString() === track?.id?.toString() ? 'text-[#D4FF00]' : 'text-white'}`}>
                                     {track.title}
                                 </h4>
                                 <p className="text-xs text-[#888888]">{track.artist.name}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
-                            <button onClick={(e) => { e.stopPropagation(); setTrackToAdd(track); }} className="text-[#555] hover:text-[#D4FF00] transition">
+                            <button onClick={(e) => { e.stopPropagation(); setTrackToAdd(track); }} className="text-[#555] hover:text-[#D4FF00] transition active:scale-90">
                                 <PlusCircle size={18} />
                             </button>
-                            <button onClick={(e) => { e.stopPropagation(); toggleFavorite(track); }} className={`transition ${isFavorite(track.id) ? 'text-[#D4FF00]' : 'text-[#555555] hover:text-white'}`}>
+                            <button onClick={(e) => handleFavoriteAction(e, track)} className={`transition active:scale-90 ${isFavorite(track.id) ? 'text-[#D4FF00]' : 'text-[#555555] hover:text-white'}`}>
                                 <Heart size={16} fill={isFavorite(track.id) ? "currentColor" : "none"} />
                             </button>
-                            <button onClick={(e) => { e.stopPropagation(); downloadTrack(track); }} className="text-[#555555] hover:text-white transition">
+                            <button onClick={(e) => { e.stopPropagation(); downloadTrack(track); }} className="text-[#555555] hover:text-white transition active:scale-90">
                                 <Download size={16} />
                             </button>
                         </div>

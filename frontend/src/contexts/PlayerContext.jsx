@@ -21,7 +21,6 @@ export const PlayerProvider = ({ children }) => {
             }
         };
 
-        // Salto automático al terminar
         const handleTrackEnd = () => {
             playNext();
         };
@@ -37,9 +36,11 @@ export const PlayerProvider = ({ children }) => {
         };
     }, [currentIndex, queue]);
 
-    // Sincronizar volumen real
+    // Sincronizar volumen real con el elemento de audio
     useEffect(() => {
-        audioRef.current.volume = volume;
+        if (audioRef.current) {
+            audioRef.current.volume = volume;
+        }
     }, [volume]);
 
     useEffect(() => {
@@ -57,7 +58,6 @@ export const PlayerProvider = ({ children }) => {
         }
     }, [currentTrack]);
 
-    // Función principal para reproducir con cola
     const playTrack = (track, newQueue = []) => {
         setCurrentTrack(track);
         if (newQueue.length > 0) {

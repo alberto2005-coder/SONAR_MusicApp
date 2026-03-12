@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { PlayerContext } from '../contexts/PlayerContext';
-import { Play, Pause, SkipBack, SkipForward, Volume2, ListMusic } from 'lucide-react';
+// IMPORTANTE: useColorThief recuperado en la versión anterior
 import { useColorThief } from '../hooks/useColorThief';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, ListMusic } from 'lucide-react';
 
 const Player = () => {
     const {
@@ -10,6 +11,9 @@ const Player = () => {
     } = useContext(PlayerContext);
 
     const [showQueue, setShowQueue] = useState(false);
+    const [lastVolume, setLastVolume] = useState(1);
+
+    // Extraemos el color dominante basado en la portada
     const dominantColor = useColorThief(currentTrack?.album?.cover_small);
 
     const formatTime = (time) => {
@@ -19,11 +23,23 @@ const Player = () => {
         return `${minutes}:${seconds}`;
     };
 
+    const toggleMute = () => {
+        if (volume > 0) {
+            setLastVolume(volume);
+            setVolume(0);
+        } else {
+            setVolume(lastVolume || 1);
+        }
+    };
+
     const progressPercent = (duration > 0 && isFinite(duration)) ? (currentTime / duration) * 100 : 0;
 
     return (
         <div className="fixed bottom-0 left-0 right-0 h-[90px] border-t border-white/5 flex items-center justify-between px-6 z-[100] transition-colors duration-1000"
-            style={{ background: `linear-gradient(to top, #050505, ${dominantColor}15)` }}>
+            style={{
+                // CORRECCIÓN: Degradado más visible con color dominante al 40%
+                background: `linear-gradient(to top, #050505, ${dominantColor}66)`
+            }}>
 
             {/* COLA FLOTANTE */}
             {showQueue && (
@@ -57,11 +73,16 @@ const Player = () => {
                 )}
             </div>
 
-            {/* CONTROLES */}
+            {/* CONTROLES CENTRALES */}
             <div className="flex flex-col items-center justify-center w-1/3 gap-2">
                 <div className="flex items-center gap-6">
                     <button onClick={playPrevious} className="text-[#888] hover:text-white transition"><SkipBack size={20} /></button>
-                    <button onClick={togglePlay} className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-black hover:scale-105 transition shadow-xl">
+                    {/* CORRECCIÓN: Botón de Play/Pause con color dominante */}
+                    <button
+                        onClick={togglePlay}
+                        className="w-10 h-10 flex items-center justify-center rounded-full text-black hover:scale-105 transition shadow-xl"
+                        style={{ backgroundColor: dominantColor !== '#000000' ? dominantColor : '#D4FF00' }}
+                    >
                         {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-1" />}
                     </button>
                     <button onClick={playNext} className="text-[#888] hover:text-white transition"><SkipForward size={20} /></button>
@@ -72,7 +93,7 @@ const Player = () => {
                     <div className="h-1 flex-1 bg-white/10 rounded-full relative group hover:h-1.5 transition-all">
                         <input type="range" min="0" max={duration || 100} step="0.1" value={currentTime}
                             onChange={(e) => seekTime(parseFloat(e.target.value))} className="w-full h-full opacity-0 cursor-pointer absolute z-10" />
-                        <div className="h-full rounded-full" style={{ width: `${progressPercent}%`, backgroundColor: dominantColor !== '#000000' ? dominantColor : '#D4FF00' }}></div>
+                        <div className="h-full rounded-full transition-all" style={{ width: `${progressPercent}%`, backgroundColor: dominantColor !== '#000000' ? dominantColor : '#D4FF00' }}></div>
                     </div>
                     <span className="text-[10px] text-[#888] font-mono w-8">{formatTime(duration)}</span>
                 </div>
@@ -84,11 +105,13 @@ const Player = () => {
                     <ListMusic size={20} />
                 </button>
                 <div className="flex items-center gap-2 group w-32">
-                    <Volume2 size={18} className="text-[#888]" />
+                    <button onClick={toggleMute} className="text-[#888] hover:text-white transition">
+                        {volume === 0 ? <VolumeX size={18} className="text-red-500" /> : <Volume2 size={18} />}
+                    </button>
                     <div className="h-1 flex-1 bg-white/10 rounded-full relative group-hover:h-1.5 transition-all">
                         <input type="range" min="0" max="1" step="0.01" value={volume}
                             onChange={(e) => setVolume(parseFloat(e.target.value))} className="w-full h-full opacity-0 cursor-pointer absolute z-10" />
-                        <div className="h-full bg-white rounded-full" style={{ width: `${volume * 100}%` }}></div>
+                        <div className="h-full bg-white rounded-full transition-all" style={{ width: `${volume * 100}%` }}></div>
                     </div>
                 </div>
             </div>
