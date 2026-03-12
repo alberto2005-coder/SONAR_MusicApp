@@ -21,9 +21,9 @@
 
 ## 🚀 Sobre el Proyecto / About The Project
 
-**SONAR** es una plataforma de streaming de música de alto rendimiento. A diferencia de otros clones, SONAR utiliza un motor de búsqueda híbrido y un sistema de streaming real que permite escuchar canciones completas sin interrupciones.
+**SONAR** es una plataforma de streaming de música de alto rendimiento. A diferencia de otras, SONAR utiliza un motor de búsqueda híbrido y un sistema de streaming real que permite escuchar canciones completas sin interrupciones.
 
-**SONAR** is a high-performance music streaming platform. Unlike other clones, SONAR uses a hybrid search engine and a real streaming system that allows listening to full tracks without interruptions.
+**SONAR** is a high-performance music streaming platform. Unlike others, SONAR uses a hybrid search engine and a real streaming system that allows listening to full tracks without interruptions.
 
 ### ✨ Características / Features
 * **Real-time Streaming:** Audio directo desde SoundCloud/YouTube con tecnología `play-dl`.
@@ -53,7 +53,7 @@ For a quick test, use the following data:
 ### Pasos / Steps
 1. **Clonar / Clone:**
    ```bash
-   git clone [https://github.com/tu-usuario/sonar.git](https://github.com/tu-usuario/sonar.git)
+   git clone [https://github.com/alberto2005-coder/SONAR_MusicApp](https://github.com/alberto2005-coder/SONAR_MusicApp)
 
 ```
 
@@ -127,9 +127,9 @@ spotify/
 
 ## 🤝 Contacto / Contact
 
-**Alberto Ortiz** Proyecto creado como clon funcional de Spotify con fines educativos.
+**Alberto Ortiz** Proyecto creado como applicacion de música gratis con fines educativos.
 
-*Project created as a functional Spotify clone for educational purposes.*
+*Project created as a functional music streaming app for educational purposes.*
 
 ---
 
