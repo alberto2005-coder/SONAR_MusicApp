@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Search as SearchIcon, LogOut, ArrowRightToLine, Library, Music } from 'lucide-react';
+import { Home, Search as SearchIcon, LogOut, ArrowRightToLine, Library, Music, User } from 'lucide-react';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Sidebar = () => {
@@ -40,7 +40,7 @@ const Sidebar = () => {
                     )}
                 </NavLink>
 
-                {/* Biblioteca (Añadido para que puedas ver tus favoritos/playlists) */}
+                {/* Biblioteca */}
                 <NavLink to="/library" className={({ isActive }) => (isActive ? activeClass : inactiveClass)}>
                     {({ isActive }) => (
                         <div className="flex items-center gap-3">
@@ -55,10 +55,20 @@ const Sidebar = () => {
             <div className="mt-auto mb-[90px] border-t border-[#1a1a1a]">
                 {user ? (
                     <div className="flex flex-col">
-                        {/* Nombre del usuario (opcional, estilo minimalista) */}
-                        <div className="px-6 pt-4 pb-1 text-[10px] text-[#555] uppercase tracking-tighter font-bold">
-                            Sesión: <span className="text-[#888]">{user.username}</span>
-                        </div>
+                        {/* BOTÓN DE PERFIL (Nuevo) */}
+                        <button
+                            onClick={() => navigate('/profile')}
+                            className="group flex flex-col px-6 pt-4 pb-2 hover:bg-[#111] transition-colors text-left"
+                        >
+                            <span className="text-[10px] text-[#555] uppercase tracking-tighter font-bold mb-1">Sesión:</span>
+                            <div className="flex items-center gap-2">
+                                <User size={14} className="text-[#D4FF00]" />
+                                <span className="text-[#888] text-sm font-bold group-hover:text-white transition-colors">
+                                    {user.username}
+                                </span>
+                            </div>
+                        </button>
+
                         <button
                             onClick={logout}
                             className="w-full flex items-center gap-3 text-[#555555] font-medium py-4 px-6 hover:text-red-500 transition-all duration-200"

@@ -8,9 +8,21 @@ const db = require('./database');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Aumentamos el límite para soportar imágenes en Base64
 
 const JWT_SECRET = 'midnight_acid_secret_key_123';
+
+// ==========================================
+// 🛠️ REPARACIÓN AUTOMÁTICA DE BASE DE DATOS
+// ==========================================
+db.serialize(() => {
+    db.run("ALTER TABLE users ADD COLUMN avatar_url TEXT", (err) => {
+        if (!err) console.log("✅ Columna avatar_url añadida correctamente.");
+    });
+    db.run("ALTER TABLE users ADD COLUMN birthdate TEXT", (err) => {
+        if (!err) console.log("✅ Columna birthdate añadida correctamente.");
+    });
+});
 
 // --- CONFIGURACIÓN DE PLAY-DL PARA SOUNDCLOUD ---
 play.getFreeClientID().then((clientID) => {
@@ -81,10 +93,10 @@ app.get('/api/music/search', async (req, res) => {
     }
 });
 
-// --- FULL AUDIO STREAM PROXY (VERSION FINAL TIEMPOS) ---
+// --- FULL AUDIO STREAM PROXY ---
 app.get('/api/music/stream', async (req, res) => {
     try {
-        const { query, duration } = req.query; // Recibimos la duración por URL
+        const { query, duration } = req.query;
         if (!query) return res.status(400).json({ error: "Missing query" });
 
         const searchResults = await play.search(query, {
@@ -106,7 +118,6 @@ app.get('/api/music/stream', async (req, res) => {
 
         if (!streamObj) return res.status(404).json({ error: "Error de stream" });
 
-        // Forzamos las cabeceras para que el navegador acepte la duración
         res.header('Content-Type', 'audio/mpeg');
         if (duration) {
             res.header('Content-Duration', duration);
@@ -120,6 +131,7 @@ app.get('/api/music/stream', async (req, res) => {
         res.status(500).json({ error: 'Fallo de servidor' });
     }
 });
+
 // --- PLAYLISTS & FAVORITES ---
 app.get('/api/playlists', authenticate, (req, res) => {
     db.all('SELECT * FROM playlists WHERE user_id = ?', [req.user.userId], (err, rows) => {
@@ -179,18 +191,18 @@ app.delete('/api/favorites/:trackId', authenticate, (req, res) => {
             res.json({ message: 'Removed' });
         });
 });
+
 app.delete('/api/playlists/:id', authenticate, (req, res) => {
     const playlistId = req.params.id;
-    // Borramos primero las canciones de la playlist y luego la playlist
     db.run('DELETE FROM playlist_tracks WHERE playlist_id = ?', [playlistId], (err) => {
         if (err) return res.status(500).json({ error: 'Error al borrar canciones' });
-
         db.run('DELETE FROM playlists WHERE id = ? AND user_id = ?', [playlistId, req.user.userId], function (err) {
             if (err) return res.status(500).json({ error: 'Error al borrar playlist' });
             res.json({ message: 'Playlist eliminada' });
         });
     });
 });
+
 // --- DOWNLOAD ---
 app.get('/api/music/download', async (req, res) => {
     try {
@@ -204,6 +216,55 @@ app.get('/api/music/download', async (req, res) => {
     } catch (err) {
         res.status(500).send("Error");
     }
+});
+
+// --- UPDATE PROFILE (VERSION PRO) ---
+app.put('/api/auth/profile', authenticate, async (req, res) => {
+    const { username, newPassword, avatarData, birthdate } = req.body;
+    const userId = req.user.userId;
+
+    try {
+        let query = 'UPDATE users SET username = ?, avatar_url = ?, birthdate = ?';
+        let params = [username, avatarData, birthdate];
+
+        if (newPassword && newPassword.trim() !== "") {
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            query += ', password = ? WHERE id = ?';
+            params.push(hashedPassword, userId);
+        } else {
+            query += ' WHERE id = ?';
+            params.push(userId);
+        }
+
+        db.run(query, params, function (err) {
+            if (err) return res.status(400).json({ error: 'Error al actualizar: ' + err.message });
+            res.json({ message: 'Perfil actualizado con éxito' });
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error de servidor' });
+    }
+});
+
+// --- GET USER STATS & INFO ---
+app.get('/api/auth/me', authenticate, (req, res) => {
+    const userId = req.user.userId;
+    const userQuery = 'SELECT id, username, avatar_url, birthdate FROM users WHERE id = ?';
+    const statsQuery = `
+        SELECT 
+            (SELECT COUNT(*) FROM favorites WHERE user_id = ?) as fav_count,
+            (SELECT COUNT(*) FROM playlists WHERE user_id = ?) as playlist_count
+    `;
+
+    db.get(userQuery, [userId], (err, user) => {
+        if (err || !user) return res.status(404).json({ error: 'User not found' });
+        db.get(statsQuery, [userId, userId], (err, stats) => {
+            res.json({
+                ...user,
+                favCount: stats.fav_count,
+                playlistCount: stats.playlist_count
+            });
+        });
+    });
 });
 
 const PORT = 5000;
