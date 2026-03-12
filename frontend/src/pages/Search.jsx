@@ -9,9 +9,10 @@ const Search = () => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [trackToAdd, setTrackToAdd] = useState(null); // Para controlar el modal
+    const [trackToAdd, setTrackToAdd] = useState(null);
 
-    const { setCurrentTrack } = useContext(PlayerContext);
+    // Importamos playTrack del contexto para gestionar la cola
+    const { playTrack, currentTrack } = useContext(PlayerContext);
     const { toggleFavorite, isFavorite, downloadTrack } = useContext(LibraryContext);
 
     const handleSearch = async (e) => {
@@ -22,7 +23,7 @@ const Search = () => {
             const res = await axios.get(`http://localhost:5000/api/music/search?q=${encodeURIComponent(query)}`);
             setResults(res.data.data.slice(0, 15));
         } catch (err) {
-            console.error(err);
+            console.error("Error en la búsqueda:", err);
         } finally {
             setLoading(false);
         }
@@ -30,7 +31,7 @@ const Search = () => {
 
     return (
         <div className="w-full text-white h-full pb-10 relative">
-            {/* Si hay una canción seleccionada, mostramos el modal */}
+            {/* Modal para añadir a playlists */}
             {trackToAdd && <AddToPlaylistModal track={trackToAdd} onClose={() => setTrackToAdd(null)} />}
 
             <div className="mb-10">
@@ -39,7 +40,7 @@ const Search = () => {
                     <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888]" size={20} />
                     <input
                         type="text"
-                        placeholder="Buscar artistas o canciones..."
+                        placeholder="¿Qué quieres escuchar?"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         className="w-full bg-[#111111] text-white rounded py-3 pl-12 pr-4 focus:outline-none border border-[#333] focus:border-[#D4FF00] transition"
@@ -54,20 +55,24 @@ const Search = () => {
                     {results.map(track => (
                         <div
                             key={track.id}
-                            className="flex items-center justify-between py-3 px-2 hover:bg-[#111111] group cursor-pointer transition-colors"
+                            className={`flex items-center justify-between py-3 px-2 hover:bg-[#111111] group cursor-pointer transition-colors ${currentTrack?.id === track.id ? 'bg-[#111111]' : ''}`}
                         >
-                            <div className="flex items-center gap-4 flex-1" onClick={() => setCurrentTrack(track)}>
-                                <img src={track.album.cover_small} alt="cover" className="w-12 h-12 object-cover" />
+                            {/* Al hacer clic, pasamos la canción y la lista completa 'results' como cola */}
+                            <div className="flex items-center gap-4 flex-1" onClick={() => playTrack(track, results)}>
+                                <img src={track.album.cover_small} alt="cover" className="w-12 h-12 object-cover rounded shadow" />
                                 <div className="flex flex-col justify-center">
-                                    <h4 className="font-bold text-sm text-white mb-0.5">{track.title}</h4>
-                                    <p className="text-xs text-[#888888]">{track.artist.name} - {track.album.title}</p>
+                                    <h4 className={`font-bold text-sm mb-0.5 ${currentTrack?.id === track.id ? 'text-[#D4FF00]' : 'text-white'}`}>
+                                        {track.title}
+                                    </h4>
+                                    <p className="text-xs text-[#888888]">{track.artist.name} • {track.album.title}</p>
                                 </div>
                             </div>
+
                             <div className="flex items-center gap-4">
-                                {/* BOTÓN DE AÑADIR A PLAYLIST */}
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setTrackToAdd(track); }}
                                     className="text-[#555555] hover:text-[#D4FF00] transition"
+                                    title="Añadir a playlist"
                                 >
                                     <PlusCircle size={18} />
                                 </button>
@@ -78,13 +83,15 @@ const Search = () => {
                                 >
                                     <Heart size={16} fill={isFavorite(track.id) ? "currentColor" : "none"} />
                                 </button>
+
                                 <button
                                     onClick={(e) => { e.stopPropagation(); downloadTrack(track); }}
                                     className="text-[#555555] hover:text-white transition"
                                 >
                                     <Download size={16} />
                                 </button>
-                                <div className="text-xs text-[#555555] w-10 text-right">
+
+                                <div className="text-xs text-[#555555] w-10 text-right font-mono">
                                     {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
                                 </div>
                             </div>

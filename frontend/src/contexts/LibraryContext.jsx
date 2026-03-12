@@ -8,24 +8,31 @@ export const LibraryProvider = ({ children }) => {
     const { token } = useContext(AuthContext);
     const [favorites, setFavorites] = useState([]);
     const [playlists, setPlaylists] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    // Función para descargar la canción
+    const downloadTrack = async (track) => {
+        try {
+            const query = `${track.artist.name} ${track.title}`;
+            // Abrimos en una pestaña nueva para iniciar la descarga desde el backend
+            window.open(`http://localhost:5000/api/music/download?query=${encodeURIComponent(query)}`, '_blank');
+        } catch (err) {
+            console.error("Error al intentar descargar:", err);
+        }
+    };
 
     const fetchLibrary = async () => {
         if (!token) return;
         setLoading(true);
         try {
             const [favsRes, playsRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/favorites', {
-                    headers: { Authorization: `Bearer ${token}` }
-                }),
-                axios.get('http://localhost:5000/api/playlists', {
-                    headers: { Authorization: `Bearer ${token}` }
-                })
+                axios.get('http://localhost:5000/api/favorites', { headers: { Authorization: `Bearer ${token}` } }),
+                axios.get('http://localhost:5000/api/playlists', { headers: { Authorization: `Bearer ${token}` } })
             ]);
             setFavorites(favsRes.data);
             setPlaylists(playsRes.data);
         } catch (err) {
-            console.error("Error al cargar biblioteca", err);
+            console.error("Error cargando biblioteca:", err);
         } finally {
             setLoading(false);
         }
@@ -35,62 +42,15 @@ export const LibraryProvider = ({ children }) => {
         fetchLibrary();
     }, [token]);
 
-    const createPlaylist = async (name) => {
-        try {
-            const res = await axios.post('http://localhost:5000/api/playlists', { name }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setPlaylists([...playlists, res.data]);
-        } catch (err) {
-            console.error("Error al crear playlist", err);
-        }
-    };
-
-    const deletePlaylist = async (id) => {
-        try {
-            await axios.delete(`http://localhost:5000/api/playlists/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setPlaylists(playlists.filter(p => p.id !== id));
-        } catch (err) {
-            console.error("Error al eliminar playlist", err);
-        }
-    };
-
-    const addToPlaylist = async (playlistId, track) => {
-        try {
-            await axios.post(`http://localhost:5000/api/playlists/${playlistId}/tracks`, {
-                track_id: track.id.toString(),
-                track_data: track
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            alert("Añadido a la playlist");
-        } catch (err) {
-            console.error("Error al añadir a playlist", err);
-        }
-    };
-
     const toggleFavorite = async (track) => {
-        if (!token) return;
-        const isFav = favorites.some(f => f.track_id === track.id.toString());
         try {
-            if (isFav) {
-                await axios.delete(`http://localhost:5000/api/favorites/${track.id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setFavorites(favorites.filter(f => f.track_id !== track.id.toString()));
-            } else {
-                await axios.post('http://localhost:5000/api/favorites', {
-                    track_id: track.id.toString(),
-                    track_data: track
-                }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setFavorites([...favorites, { track_id: track.id.toString(), track_data: track }]);
-            }
+            await axios.post('http://localhost:5000/api/favorites/toggle',
+                { trackId: track.id, trackData: track },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            fetchLibrary();
         } catch (err) {
-            console.error("Error en favoritos", err);
+            console.error("Error en favoritos:", err);
         }
     };
 
@@ -99,8 +59,7 @@ export const LibraryProvider = ({ children }) => {
     return (
         <LibraryContext.Provider value={{
             favorites, playlists, loading,
-            toggleFavorite, isFavorite,
-            createPlaylist, deletePlaylist, addToPlaylist,
+            toggleFavorite, isFavorite, downloadTrack,
             fetchLibrary
         }}>
             {children}
