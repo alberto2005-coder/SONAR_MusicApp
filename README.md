@@ -1,3 +1,8 @@
+Entendido, tienes toda la razón. **SONAR** tiene ya demasiada personalidad y tecnología propia como para llamarlo simplemente un "clon". Vamos a darle el lugar que se merece como una plataforma de streaming independiente y de alto rendimiento.
+
+Aquí tienes el **README.md** actualizado, eliminando cualquier referencia a "clon" y centrándolo en la potencia de la aplicación:
+
+```markdown
 # 🎵 SONAR - Ultimate Music Experience
 
 <div align="center">
@@ -11,33 +16,30 @@
 
 ## 📖 Índice / Index
 1. [Sobre el Proyecto / About The Project](#-sobre-el-proyecto--about-the-project)
-2. [Demo: Credenciales / Test Credentials](#-demo-credenciales--test-credentials)
-3. [Instalación / Installation](#-instalación--installation)
-4. [Uso / Usage](#-uso--usage)
+2. [Funciones de Alto Rendimiento / High-Performance Features](#-funciones-de-alto-rendimiento--high-performance-features)
+3. [Demo: Credenciales / Test Credentials](#-demo-credenciales--test-credentials)
+4. [Instalación / Installation](#-instalación--installation)
 5. [Tecnologías / Tech Stack](#-tecnologías--tech-stack)
-6. [Estructura / Structure](#-estructura--structure)
 
 ---
 
 ## 🚀 Sobre el Proyecto / About The Project
 
-**SONAR** es una plataforma de streaming de música de alto rendimiento. A diferencia de otras, SONAR utiliza un motor de búsqueda híbrido y un sistema de streaming real que permite escuchar canciones completas sin interrupciones.
+**SONAR** es una plataforma de streaming de música avanzada y minimalista. Utiliza un motor híbrido que combina metadatos precisos de Deezer con un sistema de streaming real desde SoundCloud/YouTube para ofrecer una experiencia musical completa, fluida y totalmente gratuita.
 
-**SONAR** is a high-performance music streaming platform. Unlike others, SONAR uses a hybrid search engine and a real streaming system that allows listening to full tracks without interruptions.
+---
 
-### ✨ Características / Features
-* **Real-time Streaming:** Audio directo desde SoundCloud/YouTube con tecnología `play-dl`.
-* **Smart Search:** Metadatos precisos integrando la API de Deezer.
-* **Library Management:** Crea, abre y elimina Playlists personalizadas.
-* **Persistent Auth:** Sesiones seguras con JWT y LocalStorage que no se cierran al recargar.
-* **Responsive Player:** Barra de progreso real, control de volumen y sincronización de tiempos.
+## ✨ Funciones de Alto Rendimiento / High-Performance Features
+
+* **🎨 Dynamic Adaptive Interface:** La interfaz reacciona visualmente a la música, cambiando sus colores automáticamente según la carátula del álbum mediante algoritmos de extracción de color.
+* **🎶 Smart Queue System:** Gestión inteligente de reproducción. Al elegir un tema, el sistema genera automáticamente una cola de reproducción basada en el contexto actual.
+* **🔊 Pro Audio Control:** Sistema de audio con control de volumen interno preciso, modo **Mute** inteligente y sincronización de metadatos en tiempo real.
+* **💾 Native MP3 Downloader:** Capacidad de descarga directa de pistas favoritas integrada en la interfaz de usuario.
+* **❤️ Persistent Library:** Gestión robusta de favoritos y playlists personalizadas sincronizadas con una base de datos SQLite.
 
 ---
 
 ## 🔑 Demo: Credenciales / Test Credentials
-
-Para una prueba rápida, utiliza los siguientes datos:
-For a quick test, use the following data:
 
 * **User:** `prueba@prueba.com`
 * **Password:** `prueba`
@@ -48,7 +50,7 @@ For a quick test, use the following data:
 
 ### Requisitos / Prerequisites
 * Node.js (v16+)
-* npm o yarn
+* **yt-dlp** (Necesario para el motor de streaming del servidor)
 
 ### Pasos / Steps
 1. **Clonar / Clone:**
@@ -57,83 +59,60 @@ For a quick test, use the following data:
 
 ```
 
-2. **Backend:**
+2. **Instalación:**
 ```bash
-cd backend
-npm install
+# Backend
+cd backend && npm install
+
+# Frontend
+cd ../frontend && npm install
 
 ```
 
 
-3. **Frontend:**
-```bash
-cd ../frontend
-npm install
-
-```
-
-
-
----
-
-## 🎮 Uso / Usage
-
-Debes ejecutar ambos servidores simultáneamente / Run both servers at the same time:
-
-**1. Servidor API (Backend):**
-
-```bash
-cd backend
-node server.js
-
-```
-
-**2. Cliente Web (Frontend):**
-
-```bash
-cd frontend
-npm run dev
-
-```
 
 ---
 
 ## 💻 Tecnologías / Tech Stack
 
-| Frontend | Backend | DevTools |
+| Frontend | Backend | Infraestructura |
 | --- | --- | --- |
 | React (Vite) | Express.js | SQLite (DB) |
-| Tailwind CSS | Play-dl | Axios |
-| Lucide Icons | JWT & Bcrypt | SQLite Viewer |
+| Tailwind CSS | Play-dl | Fast-Average-Color |
+| Lucide Icons | JWT & Bcrypt | Axios |
 
 ---
 
 ## 📂 Estructura / Structure
 
 ```text
-spotify/
-├── backend/            # Express API & SQLite Database
+SONAR/
+├── backend/            # Express API & SQLite Engine
 │   ├── database.sqlite # Persistencia de datos
-│   └── server.js       # Motor de streaming y rutas
-├── frontend/           # React App
-│   ├── src/contexts/   # Lógica global (Auth, Music, Playlists)
-│   ├── src/components/ # Componentes (Player, Sidebar, Modals)
-│   └── src/pages/      # Vistas (Home, Library, Search)
-└── .gitignore          # Archivos excluidos
+│   └── server.js       # Lógica de streaming y endpoints
+├── frontend/           # React Application
+│   ├── src/hooks/      # useColorThief (Motor de color)
+│   ├── src/contexts/   # Contextos de reproducción y usuario
+│   ├── src/components/ # Interfaz (Player Pro, Sidebar, Modals)
+│   └── src/pages/      # Vistas de la aplicación
+└── README.md
 
 ```
 
 ---
 
-## 🤝 Contacto / Contact
-
-**Alberto Ortiz** Proyecto creado como applicacion de música gratis con fines educativos.
-
-*Project created as a functional music streaming app for educational purposes.*
-
----
-
 <div align="center">
-<b>Hecho con ❤️ por Alberto Ortiz</b>
+<b>Desarrollado por Alberto Ortiz</b>
+
+
+
+
+
+<i>SONAR: High-Performance Music Streaming Platform</i>
 </div>
 
+```
+
+¿Te gusta cómo queda ahora? Se ve mucho más serio y profesional. ¿Hay algo más que quieras pulir antes de darlo por terminado?
+
+```
