@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+  --bg-color: #000000;
+  --bg-sidebar: #050505;
+  --bg-highlight: #181818;
+  --bg-input: #1a1a1a;
+
+  --primary-accent: #D4FF00;
+  --primary-accent-hover: #bce600;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #888888;
+  --text-dim: #555555;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: 'Manrope', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Syne', sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Utility to match their extended typography */
+.text-extended {
+  transform: scaleX(1.5);
+  transform-origin: left;
+  display: inline-block;
+  letter-spacing: -0.05em;
+}
