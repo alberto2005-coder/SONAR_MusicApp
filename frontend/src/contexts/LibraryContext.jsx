@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+﻿import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
@@ -10,7 +10,6 @@ export const LibraryProvider = ({ children }) => {
     const [playlists, setPlaylists] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Función para descargar la canción
     const downloadTrack = async (track) => {
         try {
             const query = `${track.artist.name} ${track.title}`;
@@ -41,48 +40,94 @@ export const LibraryProvider = ({ children }) => {
         fetchLibrary();
     }, [token]);
 
-    // CORRECCIÓN: Adaptado a las rutas reales de tu server.js
     const toggleFavorite = async (track) => {
         if (!token || !track) return;
-
         const trackIdStr = track.id.toString();
         const alreadyFavorite = isFavorite(track.id);
-
         try {
             if (alreadyFavorite) {
-                // Si ya es favorita, usamos la ruta DELETE de tu server.js
                 await axios.delete(`http://localhost:5000/api/favorites/${trackIdStr}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
             } else {
-                // Si no es favorita, usamos la ruta POST de tu server.js
-                // Usamos los nombres de campos que espera tu DB: track_id y track_data
                 await axios.post('http://localhost:5000/api/favorites',
-                    {
-                        track_id: trackIdStr,
-                        track_data: track
-                    },
+                    { track_id: trackIdStr, track_data: track },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             }
-            // Refrescamos la biblioteca para que el corazón cambie al instante
             await fetchLibrary();
-        } catch (err) {
-            console.error("Error en favoritos:", err);
-        }
+        } catch (err) { console.error("Error en favoritos:", err); }
     };
 
-    // Comparamos siempre como String para que coincida con la base de datos
     const isFavorite = (trackId) => {
         if (!trackId) return false;
         return favorites.some(f => f.track_id === trackId.toString());
+    };
+
+    const createPlaylist = async (name) => {
+        if (!token || !name) return;
+        try {
+            await axios.post('http://localhost:5000/api/playlists', { name }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            await fetchLibrary();
+        } catch (err) { console.error("Error al crear playlist:", err); }
+    };
+    const addToPlaylist = async (playlistId, track) => {
+        if (!token || !track) return { ok: false, reason: 'invalid' };
+        try {
+            await axios.post(`http://localhost:5000/api/playlists/${playlistId}/tracks`,
+                { track_id: track.id.toString(), track_data: track },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            await fetchLibrary();
+            return { ok: true };
+        } catch (err) {
+            if (axios.isAxiosError && err.response?.status === 409) {
+                return { ok: false, reason: 'duplicate' };
+            }
+            console.error('Error al añadir a playlist:', err);
+            return { ok: false, reason: 'error' };
+        }
+    };
+
+    const deletePlaylist = async (playlistId) => {
+        if (!token) return;
+        try {
+            await axios.delete(`http://localhost:5000/api/playlists/${playlistId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            await fetchLibrary();
+        } catch (err) { console.error("Error al eliminar playlist:", err); }
+    };
+
+    // CAMBIO AQUÃ: Ahora usa rowId para borrar duplicados correctamente
+    const removeTrackFromPlaylist = async (playlistId, rowId) => {
+        if (!token) return;
+        try {
+            await axios.delete(`http://localhost:5000/api/playlists/${playlistId}/tracks/${rowId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            await fetchLibrary();
+        } catch (err) { console.error("Error al eliminar canciÃ³n:", err); }
+    };
+
+    const updatePlaylistDetails = async (playlistId, data) => {
+        if (!token) return;
+        try {
+            await axios.put(`http://localhost:5000/api/playlists/${playlistId}`, data, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            await fetchLibrary();
+        } catch (err) { console.error("Error al editar playlist:", err); }
     };
 
     return (
         <LibraryContext.Provider value={{
             favorites, playlists, loading,
             toggleFavorite, isFavorite, downloadTrack,
-            fetchLibrary
+            fetchLibrary, createPlaylist, addToPlaylist, deletePlaylist,
+            removeTrackFromPlaylist, updatePlaylistDetails
         }}>
             {children}
         </LibraryContext.Provider>
