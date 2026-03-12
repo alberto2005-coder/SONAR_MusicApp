@@ -1,8 +1,3 @@
-Entendido, tienes toda la razón. **SONAR** tiene ya demasiada personalidad y tecnología propia como para llamarlo simplemente un "clon". Vamos a darle el lugar que se merece como una plataforma de streaming independiente y de alto rendimiento.
-
-Aquí tienes el **README.md** actualizado, eliminando cualquier referencia a "clon" y centrándolo en la potencia de la aplicación:
-
-```markdown
 # 🎵 SONAR - Ultimate Music Experience
 
 <div align="center">
