@@ -1,27 +1,26 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "SONAR - servidor local (API + frontend servido desde el mismo proceso)",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "build": "node pack.js",
+    "pack:exe": "node pack.js",
+    "pack:exe:sea": "node pack.js --sea"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@distube/ytdl-core": "^4.16.12",
     "axios": "^1.13.6",
-    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "fast-average-color": "^9.5.0",
-    "jsonwebtoken": "^9.0.3",
-    "play-dl": "^1.9.7",
-    "soundcloud-scraper": "^5.0.3",
-    "sqlite3": "^5.1.7",
-    "yt-search": "^2.13.1"
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "bun": "^1.4.3",
+    "esbuild": "^0.28.2",
+    "postject": "^1.0.0-alpha.6"
   }
 }

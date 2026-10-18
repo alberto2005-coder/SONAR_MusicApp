@@ -1,12 +1,8 @@
-import React, { useContext } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Search as SearchIcon, LogOut, ArrowRightToLine, Library, Music, User } from 'lucide-react';
-import { AuthContext } from '../contexts/AuthContext';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { Home, Search as SearchIcon, Library, Music } from 'lucide-react';
 
 const Sidebar = () => {
-    const navigate = useNavigate();
-    const { user, logout } = useContext(AuthContext);
-
     // Estilos basados en tu diseño original
     const activeClass = "flex items-center justify-between text-[#D4FF00] font-medium py-3 px-4 bg-[#181818] transition-all border-l-2 border-[#D4FF00]";
     const inactiveClass = "flex items-center gap-3 text-[#888888] font-medium py-3 px-4 hover:text-white transition-all duration-200 border-l-2 border-transparent";
@@ -50,43 +46,6 @@ const Sidebar = () => {
                     )}
                 </NavLink>
             </nav>
-
-            {/* Bottom Auth Link dinámico */}
-            <div className="mt-auto mb-[90px] border-t border-[#1a1a1a]">
-                {user ? (
-                    <div className="flex flex-col">
-                        {/* BOTÓN DE PERFIL (Nuevo) */}
-                        <button
-                            onClick={() => navigate('/profile')}
-                            className="group flex flex-col px-6 pt-4 pb-2 hover:bg-[#111] transition-colors text-left"
-                        >
-                            <span className="text-[10px] text-[#555] uppercase tracking-tighter font-bold mb-1">Sesión:</span>
-                            <div className="flex items-center gap-2">
-                                <User size={14} className="text-[#D4FF00]" />
-                                <span className="text-[#888] text-sm font-bold group-hover:text-white transition-colors">
-                                    {user.username}
-                                </span>
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={logout}
-                            className="w-full flex items-center gap-3 text-[#555555] font-medium py-4 px-6 hover:text-red-500 transition-all duration-200"
-                        >
-                            <LogOut size={20} />
-                            <span>Cerrar Sesión</span>
-                        </button>
-                    </div>
-                ) : (
-                    <button
-                        onClick={() => navigate('/auth')}
-                        className="w-full flex items-center gap-3 text-[#555555] font-medium py-4 px-6 hover:text-white transition-all duration-200"
-                    >
-                        <ArrowRightToLine size={20} />
-                        <span>Iniciar Sesión</span>
-                    </button>
-                )}
-            </div>
         </div>
     );
 };

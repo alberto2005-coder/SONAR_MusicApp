@@ -10,6 +10,13 @@ coverage/
 build/
 dist/
 
+# Generado por backend/pack.js (frontend incrustado en base64)
+backend/static-assets.js
+
+# Salida del empaquetado / datos locales del .exe
+*.exe
+SONAR_data/
+
 # Varios
 .DS_Store
 .env

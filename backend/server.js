@@ -1,9 +1,9 @@
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const axios = require('axios');
-const play = require('play-dl');
+const music = require('./music');
 const db = require('./database');
 
 const app = express();
@@ -11,77 +11,19 @@ app.use(cors());
 // Límite aumentado para soportar la subida de avatares y portadas de playlists en Base64
 app.use(express.json({ limit: '10mb' }));
 
-const JWT_SECRET = 'midnight_acid_secret_key_123';
-
 // ==========================================
-// 🛠️ REPARACIÓN Y MANTENIMIENTO DE DB
+// 👤 SIN LOGIN NI REGISTRO: siempre el usuario local
 // ==========================================
-db.serialize(() => {
-    // Columnas necesarias para el Perfil Pro
-    db.run("ALTER TABLE users ADD COLUMN avatar_url TEXT", (err) => {
-        if (!err) console.log("✅ Columna avatar_url lista.");
-    });
-    db.run("ALTER TABLE users ADD COLUMN birthdate TEXT", (err) => {
-        if (!err) console.log("✅ Columna birthdate lista.");
-    });
-    // Columna necesaria para portadas de Playlists personalizadas
-    db.run("ALTER TABLE playlists ADD COLUMN cover_url TEXT", (err) => {
-        if (!err) console.log("✅ Columna cover_url añadida a playlists.");
-    });
-    db.run("ALTER TABLE playlists ADD COLUMN description TEXT", (err) => {
-        if (!err) console.log("✅ Columna description añadida a playlists.");
-    });
-});
-
-// --- CONFIGURACIÓN SOUNDCLOUD ---
-play.getFreeClientID().then((clientID) => {
-    play.setToken({ soundcloud: { client_id: clientID } });
-    console.log("✅ play-dl: SoundCloud listo.");
-}).catch(err => console.error("❌ Error SoundCloud:", err.message));
-
-// ==========================================
-// 🔐 SISTEMA DE AUTENTICACIÓN
-// ==========================================
-
-app.post('/api/auth/register', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Datos requeridos' });
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function (err) {
-            if (err) return res.status(400).json({ error: 'El usuario ya existe' });
-            res.json({ message: 'Usuario creado', userId: this.lastID });
-        });
-    } catch (error) { res.status(500).json({ error: 'Error en registro' }); }
-});
-
-app.post('/api/auth/login', (req, res) => {
-    const { username, password } = req.body;
-    db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
-        if (err || !user) return res.status(400).json({ error: 'Usuario no encontrado' });
-        const valid = await bcrypt.compare(password, user.password);
-        if (!valid) return res.status(400).json({ error: 'Contraseña incorrecta' });
-        const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET);
-        res.json({ token, username: user.username });
-    });
-});
-
 const authenticate = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: 'No token' });
-    const token = authHeader.split(' ')[1];
-    try {
-        const payload = jwt.verify(token, JWT_SECRET);
-        req.user = payload;
-        next();
-    } catch (err) { res.status(401).json({ error: 'Token inválido' }); }
+    req.user = { userId: db.localUserId, username: 'SONAR' };
+    next();
 };
 
 // ==========================================
-// 👤 PERFIL Y ESTADÍSTICAS
+// 👤 PERFIL Y ESTADÍSTICAS (local, sin contraseña)
 // ==========================================
 
-app.get('/api/auth/me', authenticate, (req, res) => {
+app.get('/api/profile', authenticate, (req, res) => {
     const userId = req.user.userId;
     const userQuery = 'SELECT id, username, avatar_url, birthdate FROM users WHERE id = ?';
     const statsQuery = `
@@ -91,31 +33,20 @@ app.get('/api/auth/me', authenticate, (req, res) => {
     `;
     db.get(userQuery, [userId], (err, user) => {
         if (err || !user) return res.status(404).json({ error: 'User not found' });
-        db.get(statsQuery, [userId, userId], (err, stats) => {
+        db.get(statsQuery, [userId, userId], (err2, stats) => {
             res.json({ ...user, favCount: stats.fav_count, playlistCount: stats.playlist_count });
         });
     });
 });
 
-app.put('/api/auth/profile', authenticate, async (req, res) => {
-    const { username, newPassword, avatarData, birthdate } = req.body;
+app.put('/api/profile', authenticate, (req, res) => {
+    const { username, avatarData, birthdate } = req.body;
     const userId = req.user.userId;
-    try {
-        let query = 'UPDATE users SET username = ?, avatar_url = ?, birthdate = ?';
-        let params = [username, avatarData, birthdate];
-        if (newPassword && newPassword.trim() !== "") {
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
-            query += ', password = ? WHERE id = ?';
-            params.push(hashedPassword, userId);
-        } else {
-            query += ' WHERE id = ?';
-            params.push(userId);
-        }
-        db.run(query, params, function (err) {
-            if (err) return res.status(400).json({ error: 'Error DB: ' + err.message });
-            res.json({ message: 'Perfil actualizado' });
-        });
-    } catch (error) { res.status(500).json({ error: 'Error servidor' }); }
+    const query = 'UPDATE users SET username = ?, avatar_url = ?, birthdate = ? WHERE id = ?';
+    db.run(query, [username, avatarData, birthdate, userId], function (err) {
+        if (err) return res.status(400).json({ error: 'Error DB: ' + err.message });
+        res.json({ message: 'Perfil actualizado' });
+    });
 });
 
 // ==========================================
@@ -136,26 +67,61 @@ app.get('/api/music/search', async (req, res) => {
     } catch (err) { res.status(500).send("Error búsqueda"); }
 });
 
-app.get('/api/music/stream', async (req, res) => {
+// Proxy de audio: reenvía también las peticiones Range para que el
+// <audio> del navegador pueda buscar (seek) dentro de la pista.
+const pipeAudio = async (req, res, extraHeaders = {}, preResolved = null) => {
     try {
-        const { query, duration } = req.query;
-        const searchResults = await play.search(query, { limit: 1, source: { soundcloud: 'tracks' } });
-        if (!searchResults.length) return res.status(404).send("No found");
-        const streamObj = await play.stream(searchResults[0].url);
-        res.header('Content-Type', 'audio/mpeg');
-        if (duration) res.header('X-Content-Duration', duration);
-        streamObj.stream.pipe(res);
-    } catch (err) { res.status(500).send("Error stream"); }
-});
+        const track = preResolved || await music.resolveTrack(req.query.query);
+        if (!track) return res.status(404).send('No found');
+
+        const upstreamHeaders = {};
+        if (req.headers.range) upstreamHeaders.Range = req.headers.range;
+
+        const upstream = await axios.get(track.url, {
+            headers: upstreamHeaders,
+            responseType: 'stream',
+            timeout: 30000,
+            validateStatus: (s) => s < 500
+        });
+
+        res.status(upstream.status);
+        res.set('Content-Type', upstream.headers['content-type'] || track.mime);
+        res.set('Accept-Ranges', upstream.headers['accept-ranges'] || 'bytes');
+        if (upstream.headers['content-length']) res.set('Content-Length', upstream.headers['content-length']);
+        if (upstream.headers['content-range']) res.set('Content-Range', upstream.headers['content-range']);
+        if (req.query.duration) res.set('X-Content-Duration', req.query.duration);
+        Object.entries(extraHeaders).forEach(([k, v]) => res.set(k, v));
+
+        upstream.data.on('error', () => { try { res.end(); } catch (e) { /* cerrado */ } });
+        upstream.data.pipe(res);
+    } catch (err) {
+        console.error('❌ Error de streaming:', err.message);
+        if (!res.headersSent) res.status(500).send('Error stream');
+        else try { res.end(); } catch (e) { /* cerrado */ }
+    }
+};
+
+app.get('/api/music/stream', (req, res) => pipeAudio(req, res));
 
 app.get('/api/music/download', async (req, res) => {
+    // Nota: sin ffmpeg no se puede recodificar a MP3 real; se entrega
+    // el audio original (m4a/webm) con el nombre del título.
+    const name = (req.query.filename || req.query.query || 'track').toString()
+        .replace(/[\\/:*?"<>|]+/g, ' ')
+        .trim()
+        .slice(0, 120) || 'track';
+
     try {
-        const { query, filename } = req.query;
-        const search = await play.search(query, { limit: 1, source: { soundcloud: 'tracks' } });
-        const stream = await play.stream(search[0].url);
-        res.header('Content-Disposition', `attachment; filename="${filename || 'track'}.mp3"`);
-        stream.stream.pipe(res);
-    } catch (err) { res.status(500).send("Error descarga"); }
+        const track = await music.resolveTrack(req.query.query);
+        if (!track) return res.status(404).send('No found');
+        const ascii = `${name}.${track.ext}`.replace(/[^\x20-\x7E]/g, '_');
+        await pipeAudio(req, res, {
+            'Content-Disposition': `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(`${name}.${track.ext}`)}`
+        }, track);
+    } catch (err) {
+        console.error('❌ Error de descarga:', err.message);
+        if (!res.headersSent) res.status(500).send('Error descarga');
+    }
 });
 
 // ==========================================
@@ -261,5 +227,121 @@ app.delete('/api/playlists/:id/tracks/:rowId', authenticate, ensurePlaylistOwner
             res.json({ success: true });
         });
 });
-const PORT = 5000;
-app.listen(PORT, () => console.log(`🚀 SONAR Server en puerto ${PORT}`));
+// ==========================================
+// 🌐 FRONTEND: servido por el mismo servidor
+// (desde disco en desarrollo, o desde el bundle embebido en el .exe)
+// ==========================================
+const isCompiled = (typeof __COMPILED__ !== 'undefined' && __COMPILED__) || !!process.versions.sea;
+const backendDir = (typeof __dirname === 'string' && __dirname && !isCompiled) ? __dirname : path.dirname(process.execPath);
+const DISK_DIST = path.resolve(path.join(backendDir, '..', 'frontend', 'dist'));
+const isSea = isCompiled;
+
+let embedded = {};
+try { embedded = require('./static-assets'); } catch (err) { embedded = {}; }
+
+const MIME = {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'text/javascript; charset=utf-8',
+    '.mjs': 'text/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.map': 'application/json; charset=utf-8',
+    '.svg': 'image/svg+xml',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp',
+    '.ico': 'image/x-icon',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.ttf': 'font/ttf',
+    '.mp3': 'audio/mpeg'
+};
+
+const sendEmbedded = (rel, res) => {
+    res.set('Content-Type', MIME[path.extname(rel).toLowerCase()] || 'application/octet-stream');
+    res.send(Buffer.from(embedded[rel], 'base64'));
+};
+
+const sendFromDisk = (rel, res) => {
+    try {
+        const target = path.normalize(path.join(DISK_DIST, rel));
+        if (!target.startsWith(DISK_DIST)) return false;
+        if (fs.existsSync(target) && fs.statSync(target).isFile()) {
+            res.sendFile(target);
+            return true;
+        }
+    } catch (err) { /* ignoramos y seguimos */ }
+    return false;
+};
+
+if (!isSea && fs.existsSync(DISK_DIST)) {
+    app.use(express.static(DISK_DIST));
+}
+
+// Fallback SPA (BrowserRouter): cualquier ruta no-API sirve index.html
+app.use((req, res) => {
+    if (req.method !== 'GET' && req.method !== 'HEAD') return res.status(404).send('Not found');
+    if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'Endpoint no encontrado' });
+
+    const rel = req.path === '/' ? '/index.html' : req.path;
+
+    if (isSea) {
+        if (embedded[rel]) return sendEmbedded(rel, res);
+        if (sendFromDisk(rel, res)) return;
+    } else {
+        if (sendFromDisk(rel, res)) return;
+        if (embedded[rel]) return sendEmbedded(rel, res);
+    }
+
+    if (embedded['/index.html']) return sendEmbedded('/index.html', res);
+    if (sendFromDisk('/index.html', res)) return;
+    res.status(404).send('Frontend no disponible: ejecuta `npm run build` dentro de frontend/.');
+});
+
+// ==========================================
+// 🚀 ARRANQUE (puerto libre + apertura del navegador)
+// ==========================================
+const CANDIDATE_PORTS = [5000, 5001, 5002, 5003, 5004, 5005];
+
+const openBrowser = (url) => {
+    if (process.env.SONAR_NO_BROWSER === '1') return;
+    try {
+        const { exec } = require('child_process');
+        if (process.platform === 'win32') {
+            exec(`start "" "${url}"`);
+        } else if (process.platform === 'darwin') {
+            exec(`open "${url}"`);
+        } else {
+            exec(`xdg-open "${url}"`);
+        }
+    } catch (err) { console.log('ℹ️  Ábrelo manualmente en tu navegador:', url); }
+};
+
+const tryListen = (index) => {
+    if (index >= CANDIDATE_PORTS.length) {
+        console.log('⚠️  No hay puertos libres. ¿Ya está SONAR abierto?');
+        openBrowser('http://localhost:5000');
+        return;
+    }
+
+    const port = CANDIDATE_PORTS[index];
+    const server = app.listen(port, () => {
+        const url = `http://localhost:${port}`;
+        console.log(`🚀 SONAR Server en puerto ${port}`);
+        console.log(`🎧 Abriendo ${url}`);
+        setTimeout(() => openBrowser(url), 400);
+    });
+
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`ℹ️  Puerto ${port} ocupado, probando el siguiente...`);
+            tryListen(index + 1);
+        } else {
+            console.error('❌ Error del servidor:', err.message);
+        }
+    });
+};
+
+tryListen(0);

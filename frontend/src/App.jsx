@@ -5,7 +5,6 @@ import Player from './components/Player';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Library from './pages/Library';
-import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import { PlayerContext } from './contexts/PlayerContext';
 import { useColorThief } from './hooks/useColorThief';
@@ -32,7 +31,6 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
             <Route path="/library" element={<Library />} />
-            <Route path="/auth" element={<Auth />} />
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>

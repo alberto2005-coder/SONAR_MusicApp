@@ -16,7 +16,7 @@ const Home = () => {
     useEffect(() => {
         const fetchTrending = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/music/trending');
+                const res = await axios.get('/api/music/trending');
                 setTrending(res.data.data.slice(0, 15));
             } catch (err) {
                 console.error("Error cargando tendencias:", err);

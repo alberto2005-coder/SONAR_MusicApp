@@ -1,23 +1,18 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { User, ShieldCheck, Save, Camera, Heart, LayoutGrid, Calendar } from 'lucide-react';
+import { User, Camera, Heart, LayoutGrid, Calendar } from 'lucide-react';
 
 const Profile = () => {
-    const { user, token, logout } = useContext(AuthContext);
     const [userData, setUserData] = useState(null);
     const [username, setUsername] = useState('');
     const [avatarData, setAvatarData] = useState(''); // Para la imagen en Base64
     const [birthdate, setBirthdate] = useState('');
-    const [password, setPassword] = useState('');
     const [message, setMessage] = useState({ type: '', text: '' });
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/auth/me', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await axios.get('/api/profile');
                 setUserData(res.data);
                 setUsername(res.data.username);
                 setAvatarData(res.data.avatar_url || '');
@@ -25,7 +20,7 @@ const Profile = () => {
             } catch (err) { console.error(err); }
         };
         fetchUserData();
-    }, [token]);
+    }, []);
 
     // Función para procesar la imagen del equipo
     const handleFileChange = (e) => {
@@ -42,10 +37,7 @@ const Profile = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            await axios.put('http://localhost:5000/api/auth/profile',
-                { username, avatarData, birthdate, newPassword: password },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await axios.put('/api/profile', { username, avatarData, birthdate });
             setMessage({ type: 'success', text: '¡Perfil actualizado!' });
         } catch (err) { setMessage({ type: 'error', text: 'Error al guardar.' }); }
     };
@@ -116,12 +108,10 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <label className="text-[10px] font-black text-[#555] uppercase tracking-[0.2em] mb-2 block">Nueva Contraseña</label>
-                            <input
-                                type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Mantenla en blanco si no deseas cambiarla"
-                                className="w-full bg-[#0a0a0a] border border-[#222] focus:border-[#D4FF00] p-4 rounded-xl outline-none transition-all text-sm"
-                            />
+                            <label className="text-[10px] font-black text-[#555] uppercase tracking-[0.2em] mb-2 block">Tu Cuenta</label>
+                            <p className="text-[#555] text-xs leading-relaxed bg-[#0a0a0a] border border-[#222] p-4 rounded-xl">
+                                Esta copia de SONAR funciona sin usuarios ni contraseñas: todo se guarda en local en tu equipo.
+                            </p>
                         </div>
 
                         <button type="submit" className="w-full bg-[#D4FF00] text-black font-black py-4 rounded-full hover:scale-[1.02] transition-all uppercase tracking-widest text-xs shadow-lg shadow-[#D4FF00]/10">
@@ -139,19 +129,15 @@ const Profile = () => {
                         <h3 className="text-[#555] font-black uppercase text-[10px] tracking-widest mb-4 italic">Resumen de Cuenta</h3>
                         <div className="space-y-4">
                             <div className="flex justify-between text-xs">
-                                <span className="text-[#888]">Plan:</span>
-                                <span className="text-[#D4FF00] font-bold">SONAR PRO</span>
+                                <span className="text-[#888]">Modo:</span>
+                                <span className="text-[#D4FF00] font-bold">LOCAL (sin registro)</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-[#888]">Miembro desde:</span>
-                                <span className="text-white">2026</span>
+                                <span className="text-[#888]">Almacenamiento:</span>
+                                <span className="text-white">Equipo actual</span>
                             </div>
                         </div>
                     </div>
-
-                    <button onClick={logout} className="w-full py-4 bg-red-600/10 text-red-500 rounded-xl font-black hover:bg-red-600 hover:text-white transition-all text-[10px] uppercase tracking-widest border border-red-500/20">
-                        Cerrar Sesión
-                    </button>
                 </div>
             </div>
         </div>

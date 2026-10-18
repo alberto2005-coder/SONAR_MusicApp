@@ -8,7 +8,7 @@ import { Heart, Music, Plus, Play, Trash2, ChevronLeft, Download, Camera, Edit2 
 
 const Library = () => {
     const navigate = useNavigate();
-    const { user, token } = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
     const { playTrack, currentTrack } = useContext(PlayerContext);
     const nameRef = useRef(null);
 
@@ -36,9 +36,7 @@ const Library = () => {
         }
 
         try {
-            const res = await axios.get(`http://localhost:5000/api/playlists/${playlist.id}/tracks`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axios.get(`/api/playlists/${playlist.id}/tracks`);
             const tracks = res.data.map(t => ({
                 id: t.id, // Row ID único
                 track_data: typeof t.track_data === 'string' ? JSON.parse(t.track_data) : t.track_data
@@ -63,9 +61,7 @@ const Library = () => {
                 // Si es una playlist normal, refrescamos desde el servidor para ver el borrado
                 const fetchUpdate = async () => {
                     try {
-                        const res = await axios.get(`http://localhost:5000/api/playlists/${selectedPlaylist.id}/tracks`, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
+                        const res = await axios.get(`/api/playlists/${selectedPlaylist.id}/tracks`);
                         setPlaylistTracks(res.data.map(t => ({
                             id: t.id,
                             track_data: typeof t.track_data === 'string' ? JSON.parse(t.track_data) : t.track_data
@@ -112,7 +108,7 @@ const Library = () => {
         }
     };
 
-    if (!user) return <div className="p-20 text-center text-gray-500 font-bold uppercase tracking-widest">Inicia sesión para ver tu biblioteca</div>;
+    if (!user) return <div className="p-20 text-center text-gray-500 font-bold uppercase tracking-widest">Cargando tu biblioteca local...</div>;
 
     return (
         <div className="w-full text-white p-8 pb-32">

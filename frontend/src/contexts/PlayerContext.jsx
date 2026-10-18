@@ -48,7 +48,7 @@ export const PlayerProvider = ({ children }) => {
             if (currentTrack.duration) setDuration(currentTrack.duration);
 
             const query = `${currentTrack.artist.name} ${currentTrack.title}`;
-            const streamUrl = `http://localhost:5000/api/music/stream?query=${encodeURIComponent(query)}&duration=${currentTrack.duration}`;
+            const streamUrl = `/api/music/stream?query=${encodeURIComponent(query)}&duration=${currentTrack.duration}`;
 
             audioRef.current.src = streamUrl;
             audioRef.current.load();

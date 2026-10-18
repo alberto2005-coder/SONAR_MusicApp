@@ -20,7 +20,7 @@ const Search = () => {
         if (!query) return;
         setLoading(true);
         try {
-            const res = await axios.get(`http://localhost:5000/api/music/search?q=${encodeURIComponent(query)}`);
+            const res = await axios.get(`/api/music/search?q=${encodeURIComponent(query)}`);
             setResults(res.data.data.slice(0, 15));
         } catch (err) {
             console.error("Error en la búsqueda:", err);
