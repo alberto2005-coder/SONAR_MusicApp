@@ -108,10 +108,10 @@ const Library = () => {
         }
     };
 
-    if (!user) return <div className="p-20 text-center text-gray-500 font-bold uppercase tracking-widest">Cargando tu biblioteca local...</div>;
+    if (!user) return <div className="p-8 sm:p-20 text-center text-gray-500 font-bold uppercase tracking-widest text-xs sm:text-base">Cargando tu biblioteca local...</div>;
 
     return (
-        <div className="w-full text-white p-4 sm:p-8 pb-32">
+        <div className="w-full text-white pb-32">
             {selectedPlaylist ? (
                 <div className="animate-in fade-in duration-500">
                     <button onClick={() => setSelectedPlaylist(null)} className="flex items-center gap-2 text-[#888] hover:text-white mb-8 transition font-black uppercase text-[10px] tracking-[0.2em]">
@@ -136,15 +136,15 @@ const Library = () => {
                         </div>
 
                         <div className="flex-1 w-full overflow-hidden">
-                            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#D4FF00] mb-3">Playlist Personalizada</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-[#D4FF00] mb-3">Playlist Personalizada</p>
 
-                            <div className="flex items-center gap-6 group/name">
+                            <div className="flex items-center gap-3 sm:gap-6 group/name min-w-0">
                                 <h1
                                     ref={nameRef}
                                     contentEditable={selectedPlaylist.id !== 'fav'}
                                     onBlur={handleNameBlur}
                                     suppressContentEditableWarning={true}
-                                    className={`text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase leading-none outline-none focus:text-[#D4FF00] focus:bg-white/5 px-2 -ml-2 rounded-xl transition-all truncate ${selectedPlaylist.id !== 'fav' ? 'cursor-text' : ''} italic`}
+                                    className={`min-w-0 text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase leading-none outline-none focus:text-[#D4FF00] focus:bg-white/5 px-2 -ml-2 rounded-xl transition-all truncate ${selectedPlaylist.id !== 'fav' ? 'cursor-text' : ''} italic`}
                                 >
                                     {selectedPlaylist.name}
                                 </h1>
@@ -155,11 +155,11 @@ const Library = () => {
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-4 mt-8">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#D4FF00] to-white flex items-center justify-center text-black text-xs font-black">
+                            <div className="flex items-center gap-3 sm:gap-4 mt-6 sm:mt-8 min-w-0">
+                                <div className="w-8 h-8 shrink-0 rounded-full bg-gradient-to-tr from-[#D4FF00] to-white flex items-center justify-center text-black text-xs font-black">
                                     {user.username.charAt(0).toUpperCase()}
                                 </div>
-                                <p className="text-[#888] text-[10px] font-black uppercase tracking-[0.2em]">{user.username} • {playlistTracks.length} pistas guardadas</p>
+                                <p className="min-w-0 truncate text-[#888] text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em]">{user.username} • {playlistTracks.length} pistas guardadas</p>
                             </div>
                         </div>
                     </div>
@@ -172,21 +172,21 @@ const Library = () => {
                                         key={item.id}
                                         className={`group flex items-center justify-between p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all ${currentTrack?.id === item.track_data.id ? 'bg-white/10' : ''}`}
                                     >
-                                        <div className="flex items-center gap-5 flex-1" onClick={() => playTrack(item.track_data, playlistTracks.map(t => t.track_data))}>
-                                            <span className={`w-6 text-center font-mono text-[10px] font-black ${currentTrack?.id === item.track_data.id ? 'text-[#D4FF00]' : 'text-[#333]'}`}>
+                                        <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0" onClick={() => playTrack(item.track_data, playlistTracks.map(t => t.track_data))}>
+                                            <span className={`hidden sm:block w-6 shrink-0 text-center font-mono text-[10px] font-black ${currentTrack?.id === item.track_data.id ? 'text-[#D4FF00]' : 'text-[#333]'}`}>
                                                 {(index + 1).toString().padStart(2, '0')}
                                             </span>
-                                            <img src={item.track_data.album?.cover_small} className="w-12 h-12 rounded-lg shadow-2xl transition-transform group-hover:scale-105" alt="" />
-                                            <div className="truncate">
-                                                <p className={`font-black text-sm truncate max-w-md ${currentTrack?.id === item.track_data.id ? 'text-[#D4FF00]' : 'text-white'}`}>
+                                            <img src={item.track_data.album?.cover_small} className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg shadow-2xl transition-transform group-hover:scale-105 shrink-0" alt="" />
+                                            <div className="min-w-0">
+                                                <p className={`font-black text-sm truncate ${currentTrack?.id === item.track_data.id ? 'text-[#D4FF00]' : 'text-white'}`}>
                                                     {item.track_data.title}
                                                 </p>
-                                                <p className="text-[10px] text-[#555] uppercase font-black tracking-widest mt-0.5">{item.track_data.artist?.name}</p>
+                                                <p className="text-[10px] text-[#555] uppercase font-black tracking-widest mt-0.5 truncate">{item.track_data.artist?.name}</p>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-8 px-4">
-                                            <button onClick={(e) => { e.stopPropagation(); downloadTrack(item.track_data); }} className="text-[#333] hover:text-white transition opacity-0 group-hover:opacity-100">
+                                        <div className="flex items-center gap-3 sm:gap-8 px-1 sm:px-4 shrink-0">
+                                            <button onClick={(e) => { e.stopPropagation(); downloadTrack(item.track_data); }} className="hidden sm:block text-[#333] hover:text-white transition opacity-0 group-hover:opacity-100">
                                                 <Download size={18} />
                                             </button>
                                             <button onClick={(e) => { e.stopPropagation(); toggleFavorite(item.track_data); }}>
@@ -231,25 +231,26 @@ const Library = () => {
                 </div>
             ) : (
                 <>
-                    <div className="flex justify-between items-end mb-16">
-                        <div>
-                            <p className="text-[10px] font-black text-[#D4FF00] uppercase tracking-[0.5em] mb-3">Tu Universo Musical</p>
-                            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">Biblioteca</h1>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10 sm:mb-16">
+                        <div className="min-w-0">
+                            <p className="text-[10px] font-black text-[#D4FF00] uppercase tracking-[0.3em] sm:tracking-[0.5em] mb-3">Tu Universo Musical</p>
+                            <h1 className="text-[clamp(1.25rem,6.5vw,6rem)] font-black tracking-tighter uppercase italic leading-none break-words">Biblioteca</h1>
                         </div>
-                        <button onClick={() => setShowCreate(true)} className="bg-[#D4FF00] text-black p-5 rounded-full hover:rotate-90 hover:bg-white transition-all duration-500 shadow-2xl">
-                            <Plus size={32} />
+                        <button onClick={() => setShowCreate(true)} className="shrink-0 bg-[#D4FF00] text-black p-4 sm:p-5 rounded-full hover:rotate-90 hover:bg-white transition-all duration-500 shadow-2xl">
+                            <Plus size={28} className="sm:hidden" />
+                            <Plus size={32} className="hidden sm:block" />
                         </button>
                     </div>
 
                     {showCreate && (
-                        <form onSubmit={(e) => { e.preventDefault(); if (newPlaylistName.trim()) { createPlaylist(newPlaylistName); setNewPlaylistName(''); setShowCreate(false); } }} className="mb-14 bg-[#0a0a0a] p-8 rounded-[30px] flex gap-6 border border-white/5 animate-in slide-in-from-top-10 duration-500">
-                            <input autoFocus className="bg-[#111] flex-1 p-5 rounded-2xl outline-none border-2 border-transparent focus:border-[#D4FF00] text-sm font-black uppercase tracking-widest transition-all" placeholder="Dale un nombre a tu lista..." value={newPlaylistName} onChange={(e) => setNewPlaylistName(e.target.value)} />
-                            <button type="submit" className="bg-[#D4FF00] text-black font-black text-[10px] uppercase px-10 rounded-2xl hover:bg-white transition-colors">Confirmar</button>
+                        <form onSubmit={(e) => { e.preventDefault(); if (newPlaylistName.trim()) { createPlaylist(newPlaylistName); setNewPlaylistName(''); setShowCreate(false); } }} className="mb-10 sm:mb-14 bg-[#0a0a0a] p-5 sm:p-8 rounded-[30px] flex flex-col sm:flex-row gap-4 sm:gap-6 border border-white/5 animate-in slide-in-from-top-10 duration-500">
+                            <input autoFocus className="bg-[#111] flex-1 min-w-0 p-4 sm:p-5 rounded-2xl outline-none border-2 border-transparent focus:border-[#D4FF00] text-sm font-black uppercase tracking-widest transition-all" placeholder="Dale un nombre a tu lista..." value={newPlaylistName} onChange={(e) => setNewPlaylistName(e.target.value)} />
+                            <button type="submit" className="bg-[#D4FF00] text-black font-black text-[10px] uppercase px-8 sm:px-10 py-4 sm:py-0 rounded-2xl hover:bg-white transition-colors">Confirmar</button>
                             <button type="button" onClick={() => setShowCreate(false)} className="text-red-500 font-black text-[10px] uppercase px-6 hover:text-white transition-colors">Cancelar</button>
                         </form>
                     )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-10">
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,190px),1fr))] gap-5 sm:gap-8">
                         <div
                             onClick={() => openPlaylist({ id: 'fav', name: 'Tus Me Gusta' })}
                             className="bg-gradient-to-br from-[#1d08c0] to-[#6018f8] p-8 sm:p-10 rounded-[35px] cursor-pointer hover:scale-[1.05] transition-all shadow-2xl flex flex-col justify-end min-h-[200px] sm:min-h-[280px] relative overflow-hidden group border border-white/10"
@@ -257,7 +258,7 @@ const Library = () => {
                             <div className="absolute top-6 right-6 text-white/10 group-hover:text-white/30 transition-all group-hover:rotate-12 group-hover:scale-125 duration-500">
                                 <Heart size={60} fill="currentColor" />
                             </div>
-                            <h3 className="text-4xl font-black leading-none uppercase italic tracking-tighter">Me Gusta</h3>
+                            <h3 className="text-3xl sm:text-4xl font-black leading-none uppercase italic tracking-tighter break-words">Me Gusta</h3>
                             <p className="text-[10px] mt-6 font-black uppercase tracking-[0.3em] text-white/50">{favorites.length} pistas</p>
                         </div>
 

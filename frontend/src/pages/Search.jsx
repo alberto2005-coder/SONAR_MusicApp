@@ -35,7 +35,7 @@ const Search = () => {
             {trackToAdd && <AddToPlaylistModal track={trackToAdd} onClose={() => setTrackToAdd(null)} />}
 
             <div className="mb-10">
-                <h1 className="text-3xl sm:text-5xl font-black tracking-tighter mb-8" style={{ fontFamily: 'Syne', transform: 'scaleX(1.1)', transformOrigin: 'left' }}>Buscar</h1>
+                <h1 className="inline-block text-[clamp(1.4rem,5vw,2rem)] sm:text-5xl font-black tracking-tighter mb-8" style={{ fontFamily: 'Syne', transform: 'scaleX(1.1)', transformOrigin: 'left' }}>Buscar</h1>
                 <form onSubmit={handleSearch} className="relative max-w-[500px]">
                     <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888]" size={20} />
                     <input

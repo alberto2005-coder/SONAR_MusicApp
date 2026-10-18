@@ -61,10 +61,10 @@ const Player = () => {
             )}
 
             {/* INFO CANCIÓN */}
-            <div className="flex items-center gap-4 w-1/3 min-w-0">
+            <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                 {currentTrack && (
                     <>
-                        <img src={currentTrack.album?.cover_small} alt="cover" className="w-14 h-14 object-cover rounded shrink-0" />
+                        <img src={currentTrack.album?.cover_small} alt="cover" className="w-14 h-14 object-cover rounded shrink-0 max-[380px]:hidden" />
                         <div className="flex flex-col overflow-hidden min-w-0">
                             <span className="text-white font-bold text-sm truncate">{currentTrack.title}</span>
                             <span className="text-[#888888] text-xs truncate">{currentTrack.artist.name}</span>
@@ -74,8 +74,8 @@ const Player = () => {
             </div>
 
             {/* CONTROLES CENTRALES */}
-            <div className="flex flex-col items-center justify-center w-1/3 gap-2">
-                <div className="flex items-center gap-4 md:gap-6">
+            <div className="flex flex-col items-center justify-center shrink-0 gap-2">
+                <div className="flex items-center gap-3 md:gap-6">
                     <button onClick={playPrevious} className="text-[#888] hover:text-white transition"><SkipBack size={20} /></button>
                     {/* CORRECCIÓN: Botón de Play/Pause con color dominante */}
                     <button
@@ -88,19 +88,19 @@ const Player = () => {
                     <button onClick={playNext} className="text-[#888] hover:text-white transition"><SkipForward size={20} /></button>
                 </div>
 
-                <div className="w-full max-w-[450px] flex items-center gap-3">
-                    <span className="text-[10px] text-[#888] font-mono w-8 text-right">{formatTime(currentTime)}</span>
+                <div className="w-[min(40vw,450px)] max-w-full flex items-center gap-3">
+                    <span className="hidden sm:block text-[10px] text-[#888] font-mono w-8 text-right">{formatTime(currentTime)}</span>
                     <div className="h-1 flex-1 bg-white/10 rounded-full relative group hover:h-1.5 transition-all">
                         <input type="range" min="0" max={duration || 100} step="0.1" value={currentTime}
                             onChange={(e) => seekTime(parseFloat(e.target.value))} className="w-full h-full opacity-0 cursor-pointer absolute z-10" />
                         <div className="h-full rounded-full transition-all" style={{ width: `${progressPercent}%`, backgroundColor: dominantColor !== '#000000' ? dominantColor : '#D4FF00' }}></div>
                     </div>
-                    <span className="text-[10px] text-[#888] font-mono w-8">{formatTime(duration)}</span>
+                    <span className="hidden sm:block text-[10px] text-[#888] font-mono w-8">{formatTime(duration)}</span>
                 </div>
             </div>
 
             {/* VOLUMEN Y COLA */}
-            <div className="w-1/3 flex justify-end items-center gap-3 md:gap-4 min-w-0">
+            <div className="flex-1 flex justify-end items-center gap-3 md:gap-4 min-w-0">
                 <button onClick={() => setShowQueue(!showQueue)} title="Cola de reproducción" className={`transition shrink-0 ${showQueue ? 'text-[#D4FF00]' : 'text-[#888] hover:text-white'}`}>
                     <ListMusic size={20} />
                 </button>

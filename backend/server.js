@@ -256,7 +256,8 @@ const MIME = {
     '.woff': 'font/woff',
     '.woff2': 'font/woff2',
     '.ttf': 'font/ttf',
-    '.mp3': 'audio/mpeg'
+    '.mp3': 'audio/mpeg',
+    '.webmanifest': 'application/manifest+json; charset=utf-8'
 };
 
 const sendEmbedded = (rel, res) => {
@@ -305,11 +306,29 @@ app.use((req, res) => {
 // ==========================================
 const CANDIDATE_PORTS = [5000, 5001, 5002, 5003, 5004, 5005];
 
+// Navegadores que pueden abrir SONAR como aplicación (ventana sin pestañas)
+const APP_BROWSERS = [
+    process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+    process.env['PROGRAMFILES(X86)'] && path.join(process.env['PROGRAMFILES(X86)'], 'Google', 'Chrome', 'Application', 'chrome.exe'),
+    process.env.PROGRAMFILES && path.join(process.env.PROGRAMFILES, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+    process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Google', 'Chrome', 'Application', 'chrome.exe')
+].filter(Boolean);
+
+const exists = (p) => { try { return !!p && fs.existsSync(p); } catch (e) { return false; } };
+
 const openBrowser = (url) => {
     if (process.env.SONAR_NO_BROWSER === '1') return;
     try {
-        const { exec } = require('child_process');
+        const { exec, spawn } = require('child_process');
         if (process.platform === 'win32') {
+            // Modo app (--app): ventana propia, sin barra de pestañas, como un programa
+            const exe = APP_BROWSERS.find(exists);
+            if (exe) {
+                spawn(exe, ['--app=' + url, '--no-first-run', '--no-default-browser-check'], { detached: true, stdio: 'ignore' }).unref();
+                return;
+            }
             exec(`start "" "${url}"`);
         } else if (process.platform === 'darwin') {
             exec(`open "${url}"`);

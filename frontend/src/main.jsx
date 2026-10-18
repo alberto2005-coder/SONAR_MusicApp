@@ -20,3 +20,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>,
 )
+
+// Modo app (PWA): permite instalar SONAR y abrirla en ventana propia
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* sin modo app: seguimos igual */ })
+  })
+}

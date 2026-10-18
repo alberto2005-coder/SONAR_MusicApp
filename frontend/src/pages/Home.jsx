@@ -39,7 +39,7 @@ const Home = () => {
             {trackToAdd && <AddToPlaylistModal track={trackToAdd} onClose={() => setTrackToAdd(null)} />}
 
             <div className="mb-10">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter mb-2" style={{ fontFamily: 'Syne', transform: 'scaleX(1.1)', transformOrigin: 'left' }}>Escucha ahora</h1>
+                <h1 className="inline-block text-[clamp(1.4rem,5vw,2rem)] sm:text-4xl lg:text-5xl font-black tracking-tighter mb-2" style={{ fontFamily: 'Syne', transform: 'scaleX(1.1)', transformOrigin: 'left' }}>Escucha ahora</h1>
                 <p className="text-[#888888] text-sm">Los éxitos que están sonando en todo el mundo.</p>
             </div>
 

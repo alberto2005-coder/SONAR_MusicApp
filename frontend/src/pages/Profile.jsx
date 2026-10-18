@@ -42,12 +42,12 @@ const Profile = () => {
         } catch (err) { setMessage({ type: 'error', text: 'Error al guardar.' }); }
     };
 
-    if (!userData) return <div className="p-20 text-center text-[#555]">Cargando tu configuración...</div>;
+    if (!userData) return <div className="p-8 sm:p-20 text-center text-[#555]">Cargando tu configuración...</div>;
 
     return (
-        <div className="p-8 max-w-4xl mx-auto text-white pb-32">
+        <div className="max-w-4xl mx-auto text-white pb-32">
             {/* CABECERA CON NOMBRE AUTO-AJUSTABLE */}
-            <div className="flex flex-col md:flex-row items-center gap-8 mb-12 bg-[#111] p-10 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
+            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-8 md:mb-12 bg-[#111] p-6 sm:p-10 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
                 <div className="relative group cursor-pointer">
                     <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-[#D4FF00] bg-black flex items-center justify-center">
                         {avatarData ? (
@@ -68,7 +68,7 @@ const Profile = () => {
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tighter mb-4 truncate w-full italic uppercase">
                         {username}
                     </h1>
-                    <div className="flex justify-center md:justify-start gap-4">
+                    <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4">
                         <span className="bg-white/5 px-3 py-1 rounded-full text-[10px] font-bold text-[#888] flex items-center gap-2 border border-white/5">
                             <Heart size={12} className="text-[#D4FF00]" /> {userData.favCount} Favoritos
                         </span>
@@ -79,8 +79,8 @@ const Profile = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-                <div className="md:col-span-2 bg-[#111] p-8 rounded-2xl border border-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 text-left">
+                <div className="md:col-span-2 bg-[#111] p-5 sm:p-8 rounded-2xl border border-white/5">
                     <h2 className="text-xl font-bold mb-8 flex items-center gap-2 italic uppercase tracking-tighter">
                         <User size={20} className="text-[#D4FF00]" /> Ajustes Personales
                     </h2>
