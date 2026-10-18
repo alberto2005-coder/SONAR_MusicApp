@@ -11,7 +11,7 @@
  *
  * Uso:  cd backend && npm install && npm run build
  */
-const { execSync } = require('child_process');
+const { execSync, execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -110,6 +110,7 @@ if (USE_SEA) {
     injectSea(OUT_EXE, BLOB, FUSE)
         .then(() => {
             fs.rmSync(path.join(BUILD, 'SONAR.blob'), { force: true });
+            applyWindowsMetadata(OUT_EXE);
             finish();
         })
         .catch(fail);
@@ -120,6 +121,7 @@ if (USE_SEA) {
 
     step('5/5  Verificando el ejecutable');
     if (!fs.existsSync(OUT_EXE)) throw new Error('Bun no generó el .exe');
+    applyWindowsMetadata(OUT_EXE);
     finish();
 }
 
@@ -129,6 +131,42 @@ function finish() {
     console.log(`\n🎉 LISTO: ${OUT_EXE}  (${mb} MB)`);
     console.log('Doble clic y arranca el servidor + abre el navegador.');
     console.log('Los datos (SQLite) se guardan en .\\SONAR_data junto al .exe, o en %APPDATA%\\SONAR si no se puede escribir.');
+}
+
+// ---------------------------------------------------------------
+// Icono + propiedades de Windows (Descripción, Producto, Versión…)
+// Usa rcedit (herramienta en JS/C++ usada por Electron) sobre el .exe.
+function applyWindowsMetadata(exePath) {
+    if (process.platform !== 'win32') return;
+
+    const icoPath = path.join(BACKEND, 'icon', 'sonar.ico');
+    if (!fs.existsSync(icoPath)) {
+        console.log('⚠️  No existe backend\\icon\\sonar.ico: se omite icono y propiedades.');
+        console.log('    Genéralo con: powershell -ExecutionPolicy Bypass -File backend\\icon\\build-icon.ps1');
+        return;
+    }
+
+    const binName = process.arch === 'x64' ? 'rcedit-x64.exe' : 'rcedit.exe';
+    const bin = path.join(BACKEND, 'node_modules', 'rcedit', 'bin', binName);
+    if (!fs.existsSync(bin)) {
+        console.log('⚠️  rcedit no está instalado (npm i -D rcedit): se omite icono y propiedades.');
+        return;
+    }
+
+    execFileSync(bin, [
+        exePath,
+        '--set-icon', icoPath,
+        '--set-version-string', 'FileDescription', 'SONAR - Reproductor de música local',
+        '--set-version-string', 'ProductName', 'SONAR',
+        '--set-version-string', 'CompanyName', 'SONAR',
+        '--set-version-string', 'LegalCopyright', `© ${new Date().getFullYear()} SONAR`,
+        '--set-version-string', 'OriginalFilename', 'SONAR.exe',
+        '--set-version-string', 'InternalName', 'SONAR',
+        '--set-version-string', 'Comments', 'Servidor local + interfaz web en un único ejecutable',
+        '--set-file-version', '1.0.0.0',
+        '--set-product-version', '1.0.0.0'
+    ], { stdio: 'inherit' });
+    console.log('✅ Icono y propiedades de Windows aplicados (icon/sonar.ico)');
 }
 
 function fail(err) {

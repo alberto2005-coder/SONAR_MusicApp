@@ -111,15 +111,15 @@ const Library = () => {
     if (!user) return <div className="p-20 text-center text-gray-500 font-bold uppercase tracking-widest">Cargando tu biblioteca local...</div>;
 
     return (
-        <div className="w-full text-white p-8 pb-32">
+        <div className="w-full text-white p-4 sm:p-8 pb-32">
             {selectedPlaylist ? (
                 <div className="animate-in fade-in duration-500">
                     <button onClick={() => setSelectedPlaylist(null)} className="flex items-center gap-2 text-[#888] hover:text-white mb-8 transition font-black uppercase text-[10px] tracking-[0.2em]">
                         <ChevronLeft size={14} /> Volver a biblioteca
                     </button>
 
-                    <div className="flex flex-col md:flex-row items-end gap-10 mb-12">
-                        <div className="w-60 h-60 bg-[#111] border border-white/5 shadow-2xl flex items-center justify-center rounded-2xl group relative overflow-hidden flex-shrink-0">
+                    <div className="flex flex-col md:flex-row items-end gap-6 md:gap-10 mb-12">
+                        <div className="w-40 h-40 sm:w-60 sm:h-60 bg-[#111] border border-white/5 shadow-2xl flex items-center justify-center rounded-2xl group relative overflow-hidden flex-shrink-0">
                             {selectedPlaylist.cover_url ? (
                                 <img src={selectedPlaylist.cover_url} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
                             ) : (
@@ -144,7 +144,7 @@ const Library = () => {
                                     contentEditable={selectedPlaylist.id !== 'fav'}
                                     onBlur={handleNameBlur}
                                     suppressContentEditableWarning={true}
-                                    className={`text-5xl md:text-7xl font-black tracking-tighter uppercase leading-none outline-none focus:text-[#D4FF00] focus:bg-white/5 px-2 -ml-2 rounded-xl transition-all truncate ${selectedPlaylist.id !== 'fav' ? 'cursor-text' : ''} italic`}
+                                    className={`text-3xl sm:text-5xl md:text-7xl font-black tracking-tighter uppercase leading-none outline-none focus:text-[#D4FF00] focus:bg-white/5 px-2 -ml-2 rounded-xl transition-all truncate ${selectedPlaylist.id !== 'fav' ? 'cursor-text' : ''} italic`}
                                 >
                                     {selectedPlaylist.name}
                                 </h1>
@@ -234,7 +234,7 @@ const Library = () => {
                     <div className="flex justify-between items-end mb-16">
                         <div>
                             <p className="text-[10px] font-black text-[#D4FF00] uppercase tracking-[0.5em] mb-3">Tu Universo Musical</p>
-                            <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">Biblioteca</h1>
+                            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter uppercase italic leading-none">Biblioteca</h1>
                         </div>
                         <button onClick={() => setShowCreate(true)} className="bg-[#D4FF00] text-black p-5 rounded-full hover:rotate-90 hover:bg-white transition-all duration-500 shadow-2xl">
                             <Plus size={32} />
@@ -249,10 +249,10 @@ const Library = () => {
                         </form>
                     )}
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-10">
                         <div
                             onClick={() => openPlaylist({ id: 'fav', name: 'Tus Me Gusta' })}
-                            className="bg-gradient-to-br from-[#1d08c0] to-[#6018f8] p-10 rounded-[35px] cursor-pointer hover:scale-[1.05] transition-all shadow-2xl flex flex-col justify-end min-h-[280px] relative overflow-hidden group border border-white/10"
+                            className="bg-gradient-to-br from-[#1d08c0] to-[#6018f8] p-8 sm:p-10 rounded-[35px] cursor-pointer hover:scale-[1.05] transition-all shadow-2xl flex flex-col justify-end min-h-[200px] sm:min-h-[280px] relative overflow-hidden group border border-white/10"
                         >
                             <div className="absolute top-6 right-6 text-white/10 group-hover:text-white/30 transition-all group-hover:rotate-12 group-hover:scale-125 duration-500">
                                 <Heart size={60} fill="currentColor" />

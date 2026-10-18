@@ -35,7 +35,7 @@ const Player = () => {
     const progressPercent = (duration > 0 && isFinite(duration)) ? (currentTime / duration) * 100 : 0;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 h-[90px] border-t border-white/5 flex items-center justify-between px-6 z-[100] transition-colors duration-1000"
+        <div className="fixed bottom-0 left-0 right-0 h-[90px] border-t border-white/5 flex items-center justify-between px-3 sm:px-6 z-[100] transition-colors duration-1000"
             style={{
                 // CORRECCIÓN: Degradado más visible con color dominante al 40%
                 background: `linear-gradient(to top, #050505, ${dominantColor}66)`
@@ -43,7 +43,7 @@ const Player = () => {
 
             {/* COLA FLOTANTE */}
             {showQueue && (
-                <div className="absolute bottom-[100px] right-6 w-80 bg-[#111] border border-[#222] rounded-lg shadow-2xl p-4 z-[110]">
+                <div className="absolute bottom-[100px] right-2 sm:right-6 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-[#111] border border-[#222] rounded-lg shadow-2xl p-4 z-[110]">
                     <h3 className="text-sm font-bold mb-4 text-[#D4FF00]">Siguiente en la cola</h3>
                     <div className="flex flex-col gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                         {queue.slice(currentIndex + 1).map((track, i) => (
@@ -61,11 +61,11 @@ const Player = () => {
             )}
 
             {/* INFO CANCIÓN */}
-            <div className="flex items-center gap-4 w-1/3">
+            <div className="flex items-center gap-4 w-1/3 min-w-0">
                 {currentTrack && (
                     <>
-                        <img src={currentTrack.album?.cover_small} alt="cover" className="w-14 h-14 object-cover rounded" />
-                        <div className="flex flex-col overflow-hidden">
+                        <img src={currentTrack.album?.cover_small} alt="cover" className="w-14 h-14 object-cover rounded shrink-0" />
+                        <div className="flex flex-col overflow-hidden min-w-0">
                             <span className="text-white font-bold text-sm truncate">{currentTrack.title}</span>
                             <span className="text-[#888888] text-xs truncate">{currentTrack.artist.name}</span>
                         </div>
@@ -75,7 +75,7 @@ const Player = () => {
 
             {/* CONTROLES CENTRALES */}
             <div className="flex flex-col items-center justify-center w-1/3 gap-2">
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4 md:gap-6">
                     <button onClick={playPrevious} className="text-[#888] hover:text-white transition"><SkipBack size={20} /></button>
                     {/* CORRECCIÓN: Botón de Play/Pause con color dominante */}
                     <button
@@ -100,12 +100,12 @@ const Player = () => {
             </div>
 
             {/* VOLUMEN Y COLA */}
-            <div className="w-1/3 flex justify-end items-center gap-4">
-                <button onClick={() => setShowQueue(!showQueue)} className={`transition ${showQueue ? 'text-[#D4FF00]' : 'text-[#888] hover:text-white'}`}>
+            <div className="w-1/3 flex justify-end items-center gap-3 md:gap-4 min-w-0">
+                <button onClick={() => setShowQueue(!showQueue)} title="Cola de reproducción" className={`transition shrink-0 ${showQueue ? 'text-[#D4FF00]' : 'text-[#888] hover:text-white'}`}>
                     <ListMusic size={20} />
                 </button>
-                <div className="flex items-center gap-2 group w-32">
-                    <button onClick={toggleMute} className="text-[#888] hover:text-white transition">
+                <div className="hidden md:flex items-center gap-2 group w-32">
+                    <button onClick={toggleMute} title="Silenciar" className="text-[#888] hover:text-white transition">
                         {volume === 0 ? <VolumeX size={18} className="text-red-500" /> : <Volume2 size={18} />}
                     </button>
                     <div className="h-1 flex-1 bg-white/10 rounded-full relative group-hover:h-1.5 transition-all">

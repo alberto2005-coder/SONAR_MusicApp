@@ -25,8 +25,8 @@ function App() {
       />
 
       <Sidebar />
-      <div className="flex-1 flex flex-col h-full bg-transparent overflow-y-auto mb-[90px] relative">
-        <div className="p-8 pb-32">
+      <div className="flex-1 flex flex-col h-full bg-transparent overflow-y-auto overflow-x-hidden mb-[90px] relative">
+        <div className="p-4 sm:p-6 lg:p-8 pb-32">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />

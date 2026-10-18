@@ -35,7 +35,7 @@ const Search = () => {
             {trackToAdd && <AddToPlaylistModal track={trackToAdd} onClose={() => setTrackToAdd(null)} />}
 
             <div className="mb-10">
-                <h1 className="text-5xl font-black tracking-tighter mb-8" style={{ fontFamily: 'Syne', transform: 'scaleX(1.1)', transformOrigin: 'left' }}>Buscar</h1>
+                <h1 className="text-3xl sm:text-5xl font-black tracking-tighter mb-8" style={{ fontFamily: 'Syne', transform: 'scaleX(1.1)', transformOrigin: 'left' }}>Buscar</h1>
                 <form onSubmit={handleSearch} className="relative max-w-[500px]">
                     <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888]" size={20} />
                     <input
@@ -58,17 +58,17 @@ const Search = () => {
                             className={`flex items-center justify-between py-3 px-2 hover:bg-[#111111] group cursor-pointer transition-colors ${currentTrack?.id === track.id ? 'bg-[#111111]' : ''}`}
                         >
                             {/* Al hacer clic, pasamos la canción y la lista completa 'results' como cola */}
-                            <div className="flex items-center gap-4 flex-1" onClick={() => playTrack(track, results)}>
-                                <img src={track.album.cover_small} alt="cover" className="w-12 h-12 object-cover rounded shadow" />
-                                <div className="flex flex-col justify-center">
-                                    <h4 className={`font-bold text-sm mb-0.5 ${currentTrack?.id === track.id ? 'text-[#D4FF00]' : 'text-white'}`}>
+                            <div className="flex items-center gap-4 flex-1 min-w-0" onClick={() => playTrack(track, results)}>
+                                <img src={track.album.cover_small} alt="cover" className="w-12 h-12 object-cover rounded shadow shrink-0" />
+                                <div className="flex flex-col justify-center min-w-0">
+                                    <h4 className={`font-bold text-sm mb-0.5 truncate ${currentTrack?.id === track.id ? 'text-[#D4FF00]' : 'text-white'}`}>
                                         {track.title}
                                     </h4>
-                                    <p className="text-xs text-[#888888]">{track.artist.name} • {track.album.title}</p>
+                                    <p className="text-xs text-[#888888] truncate">{track.artist.name} • {track.album.title}</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setTrackToAdd(track); }}
                                     className="text-[#555555] hover:text-[#D4FF00] transition"

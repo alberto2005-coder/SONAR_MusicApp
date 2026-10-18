@@ -39,7 +39,7 @@ const Home = () => {
             {trackToAdd && <AddToPlaylistModal track={trackToAdd} onClose={() => setTrackToAdd(null)} />}
 
             <div className="mb-10">
-                <h1 className="text-5xl font-black tracking-tighter mb-2" style={{ fontFamily: 'Syne', transform: 'scaleX(1.1)', transformOrigin: 'left' }}>Escucha ahora</h1>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter mb-2" style={{ fontFamily: 'Syne', transform: 'scaleX(1.1)', transformOrigin: 'left' }}>Escucha ahora</h1>
                 <p className="text-[#888888] text-sm">Los éxitos que están sonando en todo el mundo.</p>
             </div>
 
@@ -52,7 +52,7 @@ const Home = () => {
                 {loading ? (
                     <div className="flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 rounded-full border-t-2 border-[#D4FF00]"></div></div>
                 ) : (
-                    <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
                         {trending.slice(0, 5).map((track) => (
                             <div
                                 key={`trend-${track.id}`}
@@ -114,17 +114,17 @@ const Home = () => {
                         className={`flex items-center justify-between p-2 hover:bg-[#111111] rounded group cursor-pointer transition-colors ${currentTrack?.id?.toString() === track?.id?.toString() ? 'bg-[#111111]' : ''}`}
                         onClick={() => playTrack(track, trending)}
                     >
-                        <div className="flex items-center gap-4 flex-1">
-                            <span className="text-[#555555] text-sm w-4 text-center font-mono">{index + 6}</span>
-                            <img src={track.album.cover_small} alt="cover" className="w-10 h-10 object-cover rounded" />
-                            <div>
-                                <h4 className={`font-bold text-sm ${currentTrack?.id?.toString() === track?.id?.toString() ? 'text-[#D4FF00]' : 'text-white'}`}>
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                            <span className="text-[#555555] text-sm w-4 text-center font-mono shrink-0">{index + 6}</span>
+                            <img src={track.album.cover_small} alt="cover" className="w-10 h-10 object-cover rounded shrink-0" />
+                            <div className="min-w-0">
+                                <h4 className={`font-bold text-sm truncate ${currentTrack?.id?.toString() === track?.id?.toString() ? 'text-[#D4FF00]' : 'text-white'}`}>
                                     {track.title}
                                 </h4>
-                                <p className="text-xs text-[#888888]">{track.artist.name}</p>
+                                <p className="text-xs text-[#888888] truncate">{track.artist.name}</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                             <button onClick={(e) => { e.stopPropagation(); setTrackToAdd(track); }} className="text-[#555] hover:text-[#D4FF00] transition active:scale-90">
                                 <PlusCircle size={18} />
                             </button>
