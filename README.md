@@ -1,109 +1,102 @@
-# 🎵 SONAR - Ultimate Music Experience
+# 🎵 SONAR — Música local sin cuentas
 
 <div align="center">
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
   <img src="https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
+  <img src="https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white" />
 </div>
 
 ---
 
-## 📖 Índice / Index
-1. [Sobre el Proyecto / About The Project](#-sobre-el-proyecto--about-the-project)
-2. [Funciones de Alto Rendimiento / High-Performance Features](#-funciones-de-alto-rendimiento--high-performance-features)
-3. [Demo: Credenciales / Test Credentials](#-demo-credenciales--test-credentials)
-4. [Instalación / Installation](#-instalación--installation)
-5. [Tecnologías / Tech Stack](#-tecnologías--tech-stack)
+**SONAR** es un reproductor de música para **Windows 10/11** que funciona en una sola ventana:
+busca canciones, organiza tu biblioteca y guarda todo **en local**, sin registro ni contraseña.
+
+- 🖥️ **Un solo `.exe`**: servidor, interfaz y base de datos embebidos (no instala nada más).
+- 🔍 **Búsqueda + streaming** con salto (*seek*) instantáneo dentro de la pista.
+- 📂 **Biblioteca**: playlists con portada, favoritos y descargas en SQLite local.
+- ⬇️ **Descargas** en `.m4a` / `.mp4` reales (sin ffmpeg).
+- 🎨 **Interfaz dinámica**: el color sale de la carátula; adaptable de 320 px a pantallas grandes.
+- 📲 **App instalable (PWA)**: se abre en ventana propia sin pestañas y se instala en Windows.
+
+> 📚 **Documentación completa en [`docs/`](./docs/README.md)** — instalación, guía de uso, arquitectura,
+> API, desarrollo, empaquetado, publicación, changelog y solución de problemas.
 
 ---
 
-## 🚀 Sobre el Proyecto / About The Project
+## 🚀 Empezar
 
-**SONAR** es una plataforma de streaming de música avanzada y minimalista. Utiliza un motor híbrido que combina metadatos precisos de Deezer con un sistema de streaming real desde SoundCloud/YouTube para ofrecer una experiencia musical completa, fluida y totalmente gratuita.
+**Usuario final:** ve a la [release v1.0.0](https://github.com/alberto2005-coder/SONAR_MusicApp/releases)
+y descarga `SONAR-Setup-1.0.0.exe` (instalador) o `SONAR.exe` (portable) → doble clic.
+Detalles en [docs/INSTALACION.md](./docs/INSTALACION.md).
 
----
+**Desarrollador:**
 
-## ✨ Funciones de Alto Rendimiento / High-Performance Features
+```powershell
+git clone https://github.com/alberto2005-coder/SONAR_MusicApp.git
+cd SONAR_MusicApp
 
-* **🎨 Dynamic Adaptive Interface:** La interfaz reacciona visualmente a la música, cambiando sus colores automáticamente según la carátula del álbum mediante algoritmos de extracción de color.
-* **🎶 Smart Queue System:** Gestión inteligente de reproducción. Al elegir un tema, el sistema genera automáticamente una cola de reproducción basada en el contexto actual.
-* **🔊 Pro Audio Control:** Sistema de audio con control de volumen interno preciso, modo **Mute** inteligente y sincronización de metadatos en tiempo real.
-* **💾 Native MP3 Downloader:** Capacidad de descarga directa de pistas favoritas integrada en la interfaz de usuario.
-* **❤️ Persistent Library:** Gestión robusta de favoritos y playlists personalizadas sincronizadas con una base de datos SQLite.
-
----
-
-## 🔑 Demo: Credenciales / Test Credentials
-
-* **User:** `prueba@prueba.com`
-* **Password:** `prueba`
-
----
-
-## 🛠 Instalación / Installation
-
-### Requisitos / Prerequisites
-* Node.js (v16+)
-* **yt-dlp** (Necesario para el motor de streaming del servidor)
-
-### Pasos / Steps
-1. **Clonar / Clone:**
-   ```bash
-   git clone [https://github.com/alberto2005-coder/SONAR_MusicApp](https://github.com/alberto2005-coder/SONAR_MusicApp)
-
+cd backend  ; npm install ; npm start     # API → http://localhost:5000
+cd ..\frontend ; npm install ; npm run dev  # SPA → http://localhost:5173
 ```
 
-2. **Instalación:**
-```bash
-# Backend
-cd backend && npm install
+Para generar el ejecutable:
 
-# Frontend
-cd ../frontend && npm install
-
+```powershell
+cd frontend ; npm run build
+cd ..\backend ; npm run pack:exe          # → backend\build\SONAR.exe
 ```
-
-
 
 ---
 
-## 💻 Tecnologías / Tech Stack
+## 💻 Tecnologías
 
-| Frontend | Backend | Infraestructura |
+| Frontend | Backend | Empaquetado |
 | --- | --- | --- |
-| React (Vite) | Express.js | SQLite (DB) |
-| Tailwind CSS | Play-dl | Fast-Average-Color |
-| Lucide Icons | JWT & Bcrypt | Axios |
+| React 19 + Vite 7 | Express 5 | Bun (`bun build --compile`) |
+| Tailwind CSS 4 | SQLite vía `node:sqlite` | `rcedit` (icono/propiedades) |
+| lucide-react, framer-motion | axios, cors | Inno Setup 7 (instalador) |
+| PWA (manifest + service worker) | Motor propio Innertube (sin yt-dlp/play-dl) | esbuild |
 
 ---
 
-## 📂 Estructura / Structure
+## 📂 Estructura
 
 ```text
-SONAR/
-├── backend/            # Express API & SQLite Engine
-│   ├── database.sqlite # Persistencia de datos
-│   └── server.js       # Lógica de streaming y endpoints
-├── frontend/           # React Application
-│   ├── src/hooks/      # useColorThief (Motor de color)
-│   ├── src/contexts/   # Contextos de reproducción y usuario
-│   ├── src/components/ # Interfaz (Player Pro, Sidebar, Modals)
-│   └── src/pages/      # Vistas de la aplicación
+SONAR_MusicApp/
+├── backend/            # Servidor, motor de música, BD y empaquetado
+│   ├── server.js       # API + proxy de audio + frontend embebido
+│   ├── music.js        # Búsqueda y reproducción (YouTube Innertube)
+│   ├── database.js     # SQLite local (sin módulos nativos)
+│   ├── pack.js         # Genera el .exe
+│   ├── icon/           # Iconos (.ico y PWA)
+│   └── installer/      # Script de Inno Setup
+├── frontend/           # SPA React (páginas, contextos, componentes)
+├── docs/               # 📚 Toda la documentación
 └── README.md
-
 ```
 
 ---
+
+## 📖 Índice de documentación
+
+1. [Instalación](./docs/INSTALACION.md)
+2. [Guía de uso](./docs/GUIA-DE-USO.md)
+3. [Arquitectura](./docs/ARQUITECTURA.md)
+4. [API](./docs/API.md)
+5. [Desarrollo](./docs/DESARROLLO.md)
+6. [Empaquetado (.exe e instalador)](./docs/EMPACADO.md)
+7. [Publicación de releases](./docs/PUBLICACION.md)
+8. [Cambios](./docs/CAMBIOS.md)
+9. [Solución de problemas](./docs/TROUBLESHOOTING.md)
+
+---
+
+> **Sin cuentas:** no hay login ni registro; la app crea un usuario local `SONAR` y guarda todo en
+> `SONAR_data` junto al `.exe` (o en `%APPDATA%\SONAR`).
 
 <div align="center">
 <b>Desarrollado por Alberto Ortiz</b>
-
-
-
-
-
-<i>SONAR: High-Performance Music Streaming Platform</i>
+<i>SONAR — Reproductor de música local</i>
 </div>
-
-
