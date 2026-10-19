@@ -100,3 +100,84 @@ SONAR_MusicApp/
 <b>Desarrollado por Alberto Ortiz</b>
 <i>SONAR — Reproductor de música local</i>
 </div>
+
+
+---
+
+# English Version
+
+**SONAR** is a music player for **Windows 10/11** that runs in a single window: search songs, organize your library and keep everything **stored locally**, with no account or password required.
+
+- 🖥️ **Single `.exe`**: server, UI and database bundled in (nothing else installed).
+- 🔍 **Search + streaming** with instant seek inside the track.
+- 📂 **Library**: playlists with cover art, favorites and downloads in local SQLite.
+- ⬇️ **Real `.m4a` / `.mp4`** downloads (no ffmpeg needed).
+- 🎨 **Dynamic UI**: colors extracted from the album art; scales from 320 px to large screens.
+- 📲 **Installable app (PWA)**: opens in its own window and installs on Windows.
+
+> 📚 **Full documentation in [`docs/`](./docs/README.md)** — installation, usage guide, architecture, API, development, packaging, releases, changelog and troubleshooting.
+
+## Getting Started
+
+**End user:** go to the [v1.0.0 release](https://github.com/alberto2005-coder/SONAR_MusicApp/releases) and download `SONAR-Setup-1.0.0.exe` (installer) or `SONAR.exe` (portable) → double-click. Details in [docs/INSTALACION.md](./docs/INSTALACION.md).
+
+**Developer:**
+
+```powershell
+git clone https://github.com/alberto2005-coder/SONAR_MusicApp.git
+cd SONAR_MusicApp
+
+cd backend  ; npm install ; npm start      # API -> http://localhost:5000
+cd ..\frontend ; npm install ; npm run dev # SPA -> http://localhost:5173
+```
+
+To build the executable:
+
+```powershell
+cd frontend ; npm run build
+cd ..\backend ; npm run pack:exe          # -> backend\build\SONAR.exe
+```
+
+## Tech Stack
+
+| Frontend | Backend | Packaging |
+| --- | --- | --- |
+| React 19 + Vite 7 | Express 5 | Bun (`bun build --compile`) |
+| Tailwind CSS 4 | SQLite via `node:sqlite` | `rcedit` (icon/properties) |
+| lucide-react, framer-motion | axios, cors | Inno Setup 7 (installer) |
+| PWA (manifest + service worker) | Own Innertube engine (no yt-dlp/play-dl) | esbuild |
+
+## Project Structure
+
+```text
+SONAR_MusicApp/
+├── backend/            # Server, music engine, DB and packaging
+│   ├── server.js       # API + audio proxy + embedded frontend
+│   ├── music.js        # Search and playback (YouTube Innertube)
+│   ├── database.js     # Local SQLite (no native modules)
+│   ├── pack.js         # Builds the .exe
+│   ├── icon/           # Icons (.ico and PWA)
+│   └── installer/      # Inno Setup script
+├── frontend/           # React SPA (pages, contexts, components)
+├── docs/               # Full documentation
+└── README.md
+```
+
+## Documentation Index
+
+1. [Installation](./docs/INSTALACION.md)
+2. [User Guide](./docs/GUIA-DE-USO.md)
+3. [Architecture](./docs/ARQUITECTURA.md)
+4. [API](./docs/API.md)
+5. [Development](./docs/DESARROLLO.md)
+6. [Packaging (.exe and installer)](./docs/EMPACADO.md)
+7. [Release publishing](./docs/PUBLICACION.md)
+8. [Changelog](./docs/CAMBIOS.md)
+9. [Troubleshooting](./docs/TROUBLESHOOTING.md)
+
+> **No accounts:** there is no login or sign-up; the app creates a local `SONAR` user and stores everything in `SONAR_data` next to the `.exe` (or in `%APPDATA%\SONAR`).
+
+<div align="center">
+<b>Developed by Alberto Ortiz</b>
+<i>SONAR — Local music player</i>
+</div>
